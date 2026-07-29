@@ -59,12 +59,12 @@ def cmd_status(args) -> int:
         print(BUILD_HINT.format(script=kb.REPO / "scripts" / "build.py", root=root))
         return 2
     idx = load_index()
-    ex = sorted(kb.examples_dir().glob("*.md"))
+    n_ex = kb.example_count()
     state = kb.load_state()
     print(f"構築済み  KB: {root}")
     print(f"  マニュアル  {len(available_manuals())} 冊 / {state.get('pages', '?')} ページ")
     print(f"  コマンド    {idx['total']}  {idx['counts']}")
-    print(f"  設定例      {len([p for p in ex if p.name != 'INDEX.md'])} 件")
+    print(f"  設定例      {n_ex} 件" + ("  ※未生成。build.py で再構築してください" if not n_ex else ""))
     print(f"  索引生成日  {idx.get('generated', '?')}")
     if not kb.original_dir().exists() or not any(kb.original_dir().glob("*.pdf")):
         print("  ※ PDF原本は保持していません（図の確認が必要なら再取得が要ります）")
@@ -203,7 +203,11 @@ def cmd_ex(args) -> int:
     if rows:
         print("== 索引での一致 ==")
         for ln in rows[: args.limit]:
-            print(trim(ln, 240))
+            # 索引に載っていても本文が未生成のことがある。存在しないファイルを
+            # そのまま案内しないよう、行から参照先を拾って実在を確かめる。
+            refs = re.findall(r"\[`([^`]+\.md)`\]", ln)
+            missing = [r for r in refs if not (ex_dir / r).exists()]
+            print(trim(ln, 240) + ("  ← 本文未生成" if missing else ""))
 
     # 2) 本文で拾う（完成コンフィグ内のコマンド名などに当たる）
     body = []

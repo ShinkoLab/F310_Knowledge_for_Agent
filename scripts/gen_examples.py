@@ -73,7 +73,11 @@ def is_nav_table(tbl):
 # あるので、そちらを壊さないよう対象を絞っている。
 # id の付き方: command_app_dns_teams（新体系） / command_dns_teams（旧体系・接頭辞なし）
 PROFILE_ID_RE = re.compile(r'^command_(?:(app|lbo)_)?(dns|http)_', re.I)
-SIDE_ID_RE = re.compile(r'_(center|kyoten)(\d*)$', re.I)
+# 実在する形: command_center / command_CENTER1 / command_kyoten-1 / command_centerA
+# 一部だけラベルが付くと「直前のラベルの続き」と誤読されるため、全形を取りこぼさないこと。
+# 英字サフィックスは (?-i:) で大文字限定にする。re.I のまま [A-Z] を置くと小文字にも
+# マッチし、centers / kyotens のような別語尾まで「センタs側」と誤ラベルされる。
+SIDE_ID_RE = re.compile(r'_(center|kyoten)[-_]?(\d+|(?-i:[A-Z]))?$', re.I)
 PROFILE_LABEL = {'app': 'app-profile（新コマンド体系）', 'lbo': 'lbo-profile（旧コマンド体系）'}
 SNOOP_LABEL = {'dns': 'DNS snooping', 'http': 'HTTP snooping'}
 
@@ -92,7 +96,7 @@ def pre_label(tid, heading):
         if heading and ('センタ' in heading or '拠点' in heading):
             return None
         side = 'センタ' if m.group(1).lower() == 'center' else '拠点'
-        return f"**{side}{m.group(2)}側**:"
+        return f"**{side}{m.group(2) or ''}側**:"
     return None
 
 

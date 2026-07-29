@@ -7,8 +7,8 @@ description: 古河電工 FITELnet F310 ルータの純正マニュアル（全1
 
 古河電工 FITELnet F310（ルータ）の純正マニュアルと公式設定例をローカル検索するためのスキル。
 検索は必ず `lookup.py` を経由する。ページ番号の解決や出典整形が組み込まれている。
-
-以下、`$L` は `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py"` を指す。
+実行時は必ず `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" <サブコマンド> …` の形で呼ぶこと
+（本文中で `lookup.py …` と書いている箇所も、実行時はこのフルパスに読み替える）。
 
 ## 0. 最初に構築状況を確認する
 
@@ -16,7 +16,7 @@ description: 古河電工 FITELnet F310 ルータの純正マニュアル（全1
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" status
 ```
 
-**未構築だった場合**は、ユーザーに「公式サイトから約38MB（マニュアルPDF10冊＋設定例59ページ）を取得して
+**未構築だった場合**は、ユーザーに「公式サイトから約38MB（マニュアルPDF10冊＋設定例54ページ）を取得して
 知識ベースを構築する」と伝えたうえで実行する。数分かかる。
 
 ```bash
@@ -29,40 +29,54 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
 
 | 聞かれたこと | 引く先 |
 |---|---|
-| 「実際に動く設定を組みたい」「この機能のconfig例は?」 | **設定例**（`$L ex`）。まず実例、必要ならマニュアルで裏を取る |
-| 「このコマンドの書式は?」「パラメータの意味は?」 | **コマンド索引**（`$L cmd`）。書式の正典 |
-| 「このログ/エラーの意味は?」 | `$L grep "<文言>" message` |
-| 「対応本数・性能値は?」「MIB/Trapは?」 | `$L grep "<語>" siyou` |
-| 「この機能は何をする?」 | `$L grep "<語>" kinou` |
-| 「動かない、切り分けたい」 | `$L grep "<症状>" trouble` |
+| 「実際に動く設定を組みたい」「この機能のconfig例は?」 | **設定例**（`lookup.py ex`）。まず実例、必要ならマニュアルで裏を取る |
+| 「このコマンドの書式は?」「パラメータの意味は?」 | **コマンド索引**（`lookup.py cmd`）。書式の正典 |
+| 「このログ/エラーの意味は?」 | `lookup.py grep "<文言>" message` |
+| 「対応本数・性能値は?」「MIB/Trapは?」 | `lookup.py grep "<語>" siyou` |
+| 「この機能は何をする?」 | `lookup.py grep "<語>" kinou` |
+| 「動かない、切り分けたい」 | `lookup.py grep "<症状>" trouble` |
 
 マニュアル＝**コマンド書式の正典**、設定例＝**動く設定の実例集**。用途で使い分ける。
 どのマニュアルに何が載るかの詳細は `references/manuals_index.md` を読む。
 
 ## 2. lookup.py の使い方
 
+**1行がそのまま1回のBash呼び出しになる。** シェル変数は呼び出しをまたいで残らないので、
+`LOOKUP=…` のような短縮は使わず、毎回このままフルパスで実行すること。
+
 ```bash
-$L cmd "ospf"                  # コマンド名の部分一致 → 動作モードと出典ページ
-$L cmd "^router ospf" --full   # 【機能】と入力形式（no形式含む）を全文表示
-$L cmd "MTU" --desc            # 【機能】本文も検索対象にする（名前が思い出せない時）
-$L cmd "vrf" --manual cmd_refe_ope   # 運用管理編に絞る
+# コマンド索引
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "ospf"
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "^router ospf" --full
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "MTU" --desc
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "vrf" --manual cmd_refe_ope
 
-$L grep "link up" message      # 本文検索。1行ごとに "message.pdf p.414: …" で返る
-$L grep "MAP-E" kinou siyou    # 対象マニュアルを絞る（省略時は全10冊）
+# 本文検索（"message.pdf p.414: …" の形で出典付きで返る。対象は省略時 全10冊）
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "link up" message
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "MAP-E" kinou siyou
 
-$L page cmd_refe_config 190    # そのページの本文をそのまま出す
-$L page message 414-415        # 範囲指定
+# ページ本文（N または N-M）
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 190
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page message 414-415
 
-$L ex "v6プラス"                # 設定例を索引＋本文から検索
-$L ex "dns-snooping"           # 完成コンフィグ内のコマンド名でも引ける
+# 設定例（索引＋本文。完成コンフィグ内のコマンド名でも引ける）
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "v6プラス"
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "dns-snooping"
 ```
 
-設定例の本文を読むときは、`$L ex` が出したファイルパスを Read する。
+| サブコマンド | 主なオプション |
+|---|---|
+| `cmd <regex>` | `--full`（【機能】と入力形式を全文）/ `--desc`（機能本文も検索）/ `--manual <名>` |
+| `grep <pat> [manual…]` | `--case`（大小区別）/ `--limit` |
+| `page <manual> <N[-M]>` | — |
+| `ex <keyword>` | `--limit` |
+
+設定例の本文を読むときは、`ex` が出したファイルパスを Read する。
 
 ## 3. 原本の確認は md で完結する
 
 `md/*.md` は PDF のテキスト層をそのまま抽出したもので、**同じPDFを再抽出しても同一のテキストしか返らない**。
-前後の文脈が必要なときは `$L page <manual> <N-M>` を使い、**PDFは開かない**。
+前後の文脈が必要なときは `lookup.py page <manual> <N-M>` を使い、**PDFは開かない**。
 
 PDFを開く必要があるのは、構成図・写真などテキストに無いものを**人が目で見る**ときだけ。
 その場合のみ `open "<KB>/original/<file>.pdf"` を案内する（KBの場所は `status` が表示する）。

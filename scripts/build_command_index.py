@@ -11,6 +11,7 @@ build.py の網羅性チェック（構成定義編 1,299 / 運用管理編 615�
 """
 import json
 import re
+import sys
 from datetime import date
 
 import kb_paths as kb
@@ -163,18 +164,76 @@ def extract_sections(block: list[str]) -> dict:
     return out
 
 
+def load_existing(out) -> dict:
+    """既存の索引を {manual: [entry, ...]} で返す。無い・壊れている場合は空。"""
+    if not out.exists():
+        return {}
+    try:
+        doc = json.loads(out.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"  既存の索引を読めません（無視します）: {e}", file=sys.stderr)
+        return {}
+    # JSONとしては読めても構造が想定外（リスト、commands が null、要素が非dict等）の
+    # ことがある。ここで落ちると復旧ビルド自体が止まるので、壊れた索引として無視する。
+    commands = doc.get("commands") if isinstance(doc, dict) else None
+    if not isinstance(commands, list):
+        print(f"  既存の索引の形式が想定と違います（無視します）: {out.name}", file=sys.stderr)
+        return {}
+    by_manual = {}
+    for c in commands:
+        if isinstance(c, dict):
+            by_manual.setdefault(c.get("manual", ""), []).append(c)
+    return by_manual
+
+
 def run() -> dict:
     md = kb.md_dir()
+    md.mkdir(parents=True, exist_ok=True)
+
+    out = md / "command_index.json"
+    present = [s for s in TARGETS if (md / f"{s}.md").exists()]
+    missing = [s for s in TARGETS if s not in present]
+    # 「索引ファイルがある＝索引が完全」ではない。存在だけを根拠に丸ごと保持すると、
+    # 片方の冊が復旧しても新しく読めたコマンドがいつまでも索引に入らない。
+    # 読める冊は作り直し、欠けている冊だけ既存索引のエントリを引き継ぐ。
+    kept = load_existing(out) if missing else {}
+    if missing:
+        detail = ", ".join(
+            f"{s}（既存索引から {len(kept[s])} 件を引き継ぎ）" if kept.get(s) else s
+            for s in missing)
+        print(f"  コマンドリファレンスのmdがありません: {detail}", file=sys.stderr)
+
+    if not present:
+        # 解析できるmdが1冊も無い。既存の索引があるならそれが最善なので触らない。
+        # このとき返すのは既存索引の実件数。0 を返すと呼び出し側が
+        # 「抽出が全崩壊した」と誤認し、.build.json の基準値まで壊れる。
+        counts = {s: len(v) for s, v in kept.items() if s in TARGETS and v}
+        if counts:
+            print(f"  解析できるmdがないため既存の索引をそのまま使います"
+                  f": {sum(counts.values())} コマンド {counts}", file=sys.stderr)
+        else:
+            print("  索引を作れません（コマンドリファレンスのmdが1冊もありません）", file=sys.stderr)
+        return counts
+
     per_manual = {}
     commands = []
     for stem, label in TARGETS.items():
-        if not (md / f"{stem}.md").exists():
-            print(f"  {stem:20s} 見つかりません（スキップ）")
-            continue
-        e = parse(stem, label)
+        if stem in present:
+            e = parse(stem, label)
+            print(f"  {stem:20s} {len(e):5d} commands")
+        else:
+            e = kept.get(stem, [])
+            if not e:
+                continue
+            print(f"  {stem:20s} {len(e):5d} commands（既存索引から引き継ぎ）")
         per_manual[stem] = len(e)
         commands.extend(e)
-        print(f"  {stem:20s} {len(e):5d} commands")
+
+    if not commands:
+        # 空の索引を書くと is_built() だけ満たしてしまい、lookup が黙って「該当なし」を
+        # 返すKBができあがる。それなら書かない方がよい。
+        print("  コマンドを1件も抽出できませんでした。索引は更新しません。", file=sys.stderr)
+        return per_manual
 
     doc = {
         "generated": date.today().isoformat(),
@@ -184,11 +243,20 @@ def run() -> dict:
         "total": len(commands),
         "commands": commands,
     }
-    out = md / "command_index.json"
     out.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n合計 {len(commands)} コマンド → {out} ({out.stat().st_size/1024:.1f} KB)")
     return per_manual
 
 
+def main() -> int:
+    """終了コードは「使える索引がKBに在るか」で決める。
+    返り値の真偽で判定すると、意図的な引き継ぎ(=正常)で 1、抽出全崩壊(=異常)で 0 と
+    両方向に反転してしまう。"""
+    counts = run()
+    if not (kb.md_dir() / "command_index.json").exists():
+        return 1
+    return 0 if sum(counts.values()) else 1
+
+
 if __name__ == "__main__":
-    run()
+    raise SystemExit(main())

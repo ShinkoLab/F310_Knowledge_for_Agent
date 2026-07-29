@@ -11,6 +11,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Union   # `list | dict` は Python 3.10 以降。3.9 でも import できるようにする
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
@@ -63,11 +64,24 @@ def save_state(state: dict) -> None:
 
 
 def is_built() -> bool:
-    """検索可能な状態か。md本文とコマンド索引が揃っていることを最低条件とする。"""
+    """マニュアル検索が可能な状態か。本文とコマンド索引が揃っていることを条件とする。
+
+    設定例はここに含めない。含めると、マニュアルが完全に揃っていても設定例の生成に
+    失敗しただけでコマンド検索まで止まってしまう。設定例の欠落は
+    example_count()（status表示）と lookup.py ex 側で個別に扱う。
+    """
     return (md_dir() / "command_index.json").exists() and any(md_dir().glob("*.md"))
 
 
-def load_manifest(path: Path) -> list | dict:
+def example_count() -> int:
+    """生成済みの設定例md（INDEX.md を除く）の数。"""
+    d = examples_dir()
+    if not d.is_dir():
+        return 0
+    return len([p for p in d.glob("*.md") if p.name != "INDEX.md"])
+
+
+def load_manifest(path: Path) -> Union[list, dict]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
