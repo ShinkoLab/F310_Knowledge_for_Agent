@@ -1,0 +1,13 @@
+{
+  "name": "f310-kb",
+  "owner": {
+    "name": "shinko"
+  },
+  "plugins": [
+    {
+      "name": "fitelnet-f310",
+      "source": "./",
+      "description": "FITELnet F310 のマニュアル・設定例をローカル知識ベースとして引くスキル"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# 古河電工のマニュアル・設定例本文は再配布しない。
+# 実データは KB（既定 ~/.claude/f310-kb）に置き、利用者が build.py で構築する。
+manuals/
+*.pdf
+
+# 変換結果・取得HTMLをリポジトリ内に出した場合の保険
+md/
+html/
+staging/
+pages/
+
+__pycache__/
+*.pyc
+.DS_Store

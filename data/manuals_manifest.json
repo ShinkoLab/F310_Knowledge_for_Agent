@@ -1,0 +1,66 @@
+{
+  "source": "https://www.furukawaelectric.com/fitelnet/product/f310/manual/",
+  "note": "FITELnet F310 純正マニュアルの取得先。本リポジトリはPDF本体を含まない。利用者が build.py で公式サイトから取得する。pages は取得物の健全性確認に使う想定ページ数。",
+  "manuals": [
+    {
+      "file": "goriyouF310.pdf",
+      "title": "ご利用にあたって",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/goriyouF310.pdf",
+      "pages": 58
+    },
+    {
+      "file": "kinou.pdf",
+      "title": "機能説明書",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/kinou.pdf",
+      "pages": 114
+    },
+    {
+      "file": "cmd_refe_config.pdf",
+      "title": "コマンドリファレンス 構成定義編",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/cmd_refe_config.pdf",
+      "pages": 1136
+    },
+    {
+      "file": "cmd_refe_ope.pdf",
+      "title": "コマンドリファレンス 運用管理編",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/cmd_refe_ope.pdf",
+      "pages": 782
+    },
+    {
+      "file": "message.pdf",
+      "title": "メッセージ一覧",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/message.pdf",
+      "pages": 1604
+    },
+    {
+      "file": "siyou.pdf",
+      "title": "仕様一覧",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/siyou.pdf",
+      "pages": 78
+    },
+    {
+      "file": "trouble.pdf",
+      "title": "トラブルシューティング",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/trouble.pdf",
+      "pages": 23
+    },
+    {
+      "file": "oss_list.pdf",
+      "title": "OSSライセンス一覧",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/310/pdf/oss_list.pdf",
+      "pages": 13
+    },
+    {
+      "file": "rackmountRMKB010211wb.pdf",
+      "title": "ラックマウント取付説明書（RMKB010211）",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/option/pdf/rackmountRMKB010211wb.pdf",
+      "pages": 44
+    },
+    {
+      "file": "usbband.pdf",
+      "title": "USB脱落防止バンド取付説明書",
+      "url": "https://www.furukawaelectric.com/fitelnet/f/man/option/pdf/usbband.pdf",
+      "pages": 21
+    }
+  ]
+}

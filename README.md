@@ -1,0 +1,99 @@
+# FITELnet F310 Knowledge for Agent
+
+古河電工 **FITELnet F310**（ルータ）の純正マニュアルと公式設定例を、Claude Code から検索できる
+知識ベースにするプラグインです。F310 のコマンド構文・config 作成・ログの意味・設定例の調べ物を、
+出典（マニュアル名とページ番号／設定例のURL）付きで答えられるようになります。
+
+## 再配布について
+
+**このリポジトリは古河電気工業株式会社のマニュアル本文・設定例本文を一切含みません。**
+含まれているのは取得先URL・変換スクリプト・調べ方の手順だけです。
+
+マニュアルPDFと設定例ページは、**利用者自身が**ビルド時に公式サイトから取得します。
+取得したデータの著作権は古河電気工業株式会社に帰属します。手元での参照にとどめ、再配布しないでください。
+
+- マニュアル: <https://www.furukawaelectric.com/fitelnet/product/f310/manual/>
+- 設定例: <https://www.furukawaelectric.com/fitelnet/setting/>
+
+## 必要なもの
+
+| 依存 | 用途 |
+|---|---|
+| `python3` | スクリプト全般（標準ライブラリのみ。pip 不要） |
+| `mutool`（MuPDF） | PDFのテキスト抽出。**ビルド時のみ**必要。`brew install mupdf-tools` / `apt install mupdf-tools` |
+
+テキスト層のあるPDFなのでOCRは不要です。
+
+## インストール
+
+Claude Code で:
+
+```
+/plugin marketplace add <このリポジトリのパスまたは GitHub の owner/repo>
+/plugin install fitelnet-f310@f310-kb
+```
+
+## 知識ベースの構築
+
+初回の質問時にスキルが未構築を検知して構築を提案しますが、手動でも実行できます。
+
+```bash
+python3 scripts/build.py
+```
+
+公式サイトからマニュアルPDF 10冊（約38MB）と設定例ページ 59件を取得し、変換・索引化します。
+サイトへの負荷を避けるため逐次・1秒間隔で取得するため、初回は数分かかります。
+
+主なオプション:
+
+| オプション | 内容 |
+|---|---|
+| `--dry-run` | 全URLの疎通確認のみ（リンク切れの検出用） |
+| `--skip-fetch` | 取得を省き、手元のPDF/HTMLから再生成のみ |
+| `--force` | 取得済みでも取り直す |
+| `--seed DIR` | 手元にある `original/*.pdf` を流用してダウンロードを省く |
+| `--prune-pdf` | 変換後にPDFを削除して容量を空ける（図の確認はできなくなる） |
+
+ビルド末尾で網羅性（3,873ページ / 1,914コマンド / 設定例54件）を自動チェックします。
+値がズレた場合は、取得漏れかサイト側の改版が疑われます。
+
+## 知識ベースの置き場所
+
+`$F310_KB_DIR`、未設定なら `~/.claude/f310-kb`。プラグインはバージョンごとに別ディレクトリへ
+展開され更新時に入れ替わるため、生成データは意図的にプラグイン外へ置いています。
+
+```
+~/.claude/f310-kb/
+├─ .build.json          # 取得日時・Last-Modified・生成件数
+├─ original/*.pdf       # 取得したPDF 10冊
+├─ html/*.html          # 取得した設定例ページ（UTF-8化済）
+└─ md/
+   ├─ *.md              # ページ番号マーカー付き全文
+   ├─ command_index.json  # 全1,914コマンドの索引
+   └─ setting_examples/   # 設定例54件 + INDEX.md
+```
+
+削除するときはこのディレクトリごと消してください（`rm -rf ~/.claude/f310-kb`）。再構築すれば元に戻ります。
+
+## 直接使う
+
+スキル経由でなくコマンドラインからも引けます。
+
+```bash
+python3 scripts/lookup.py status                    # 構築状況
+python3 scripts/lookup.py cmd "^router ospf" --full # コマンド構文
+python3 scripts/lookup.py grep "link up" message    # 本文検索（出典ページ付き）
+python3 scripts/lookup.py page cmd_refe_config 190  # ページ本文
+python3 scripts/lookup.py ex "v6プラス"              # 設定例検索
+```
+
+## リポジトリ構成
+
+```
+.claude-plugin/     プラグイン定義・マーケットプレース定義
+skills/fitelnet-f310/
+  SKILL.md          スキル本体（調べ方の手順・出典ルール）
+  references/       マニュアルのルーティング表
+scripts/            取得・変換・索引化・検索
+data/               取得先URLと設定例マニフェスト（本文は含まない）
+```

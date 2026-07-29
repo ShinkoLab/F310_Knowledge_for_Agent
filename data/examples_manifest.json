@@ -1,0 +1,686 @@
+[
+ {
+  "no": "1",
+  "title": "JPIX社の「v6プラス」固定IPサービスを利用する",
+  "href": "./ipoe/v6plus_fixedip.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/v6plus_fixedip.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "v6plus_fixedip"
+ },
+ {
+  "no": "2",
+  "title": "JPIX社の「v6プラス」IPv6/IPv4インターネットサービスを利用する",
+  "href": "./ipoe/v6plus_mape.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/v6plus_mape.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "v6plus_mape"
+ },
+ {
+  "no": "4",
+  "title": "NTTコミュニケーションズ社の「OCNバーチャルコネクト」IPoEサービスを利用する",
+  "href": "./ipoe/ocn_vc.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/ocn_vc.html",
+  "device": "F70/F71/F220/F221/F225/F310",
+  "kind": "detail",
+  "md": "ocn_vc"
+ },
+ {
+  "no": "5",
+  "title": "ビッグローブ社の「IPv6オプション」サービスを利用する",
+  "href": "./ipoe/ipv6option.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/ipv6option.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipv6option"
+ },
+ {
+  "no": "6",
+  "title": "ビッグローブ社の「BIGLOBE IPv6」IPIPサービスを利用する",
+  "href": "./ipoe/biglobe_ipv6.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/biglobe_ipv6.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "biglobe_ipv6"
+ },
+ {
+  "no": "6_1",
+  "title": "BBIX社の「OCX光 インターネット / v6IX（固定IP方式）」を利用する",
+  "href": "./ipoe/ocx_ipip.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/ocx_ipip.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ocx_ipip"
+ },
+ {
+  "no": "6_2",
+  "title": "HB46PPによる国内標準方式を利用する ・ビッグローブ社「BIGLOBE IPv6サービス（IPIP）」 ・BBIX社「OCX光 インターネット / v6IX」",
+  "href": "./ipoe/hb46pp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/hb46pp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "hb46pp"
+ },
+ {
+  "no": "8",
+  "title": "アルテリア・ネットワークス社の「クロスパス」サービスを利用する",
+  "href": "./ipoe/arteria_xpass.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/arteria_xpass.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "arteria_xpass"
+ },
+ {
+  "no": "9",
+  "title": "各社の固定IPサービスでL2TP/IPsecおよびL2TPv3/IPsecを利用する",
+  "href": "./ipoe/static_l2tp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/static_l2tp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static_l2tp"
+ },
+ {
+  "no": "10",
+  "title": "各社の固定IPサービスでローカルブレイクアウトを利用する",
+  "href": "./ipoe/static_lbo.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/static_lbo.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static_lbo"
+ },
+ {
+  "no": "11",
+  "title": "各社の動的IPサービスでローカルブレイクアウトを利用する",
+  "href": "./ipoe/mape_lbo.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/mape_lbo.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "mape_lbo"
+ },
+ {
+  "no": "15_1",
+  "title": "USBデータ通信端末 (モデムモード)を利用する",
+  "href": "./interface/usb_modem-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/interface/usb_modem-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "usb_modem-01"
+ },
+ {
+  "no": "16_1",
+  "title": "USBデータ通信端末 (ルータモード)を利用する",
+  "href": "./interface/usb_ethernet-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/interface/usb_ethernet-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "usb_ethernet-01"
+ },
+ {
+  "no": "35",
+  "title": "インターネットVPNを利用してAmazonVPCに接続する",
+  "href": "./cloud-connect/amazon_vpc.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/cloud-connect/amazon_vpc.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "amazon_vpc"
+ },
+ {
+  "no": "39",
+  "title": "Oracle Cloud InfrastructureとVPN接続する",
+  "href": "./cloud-connect/OCI-list.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/cloud-connect/OCI-list.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "OCI-list"
+ },
+ {
+  "no": "40",
+  "title": "Microsoft Azure Virtual NetworkとVPN接続する",
+  "href": "./cloud-connect/azure_vpn.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/cloud-connect/azure_vpn.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "azure_vpn"
+ },
+ {
+  "no": "41",
+  "title": "Furukawa Electric FITELnet（Cloudflare社サイト）",
+  "href": "https://developers.cloudflare.com/magic-wan/configuration/manually/third-party/fitelnet/",
+  "url": "https://developers.cloudflare.com/magic-wan/configuration/manually/third-party/fitelnet/",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "external",
+  "md": ""
+ },
+ {
+  "no": "42",
+  "title": "Cloudflare Magic WAN と FITELnet をつなぐ - ダイナミック IP 編（外部サイト）",
+  "href": "https://qiita.com/KeioCF/items/0cc5d3fca77f5b3b3455",
+  "url": "https://qiita.com/KeioCF/items/0cc5d3fca77f5b3b3455",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "external",
+  "md": ""
+ },
+ {
+  "no": "43",
+  "title": "Cloudflare Magic WAN と FITELnet をつなぐ（外部サイト）",
+  "href": "https://qiita.com/KeioCF/items/427507edcb462c6983f2",
+  "url": "https://qiita.com/KeioCF/items/427507edcb462c6983f2",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "external",
+  "md": ""
+ },
+ {
+  "no": "12_3",
+  "title": "IPv4アドレスを利用する",
+  "href": "../product/f310/setting/detail/wan-manual.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/wan-manual.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "wan-manual"
+ },
+ {
+  "no": "13_3",
+  "title": "PPPoE方式 (アドレス固定)を利用する",
+  "href": "../product/f310/setting/detail/wan-manual.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/pppoe-01.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "wan-manual"
+ },
+ {
+  "no": "14_3",
+  "title": "PPPoE方式 (アドレス不定)を利用する",
+  "href": "../product/f310/setting/detail/wan-manual.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/pppoe-02.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "wan-manual"
+ },
+ {
+  "no": "21",
+  "title": "WAN側へ送信するパケットに対してシェーピング（保証帯域制御）を行う",
+  "href": "./interface/f70_CBQ.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/interface/f70_CBQ.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "f70_CBQ"
+ },
+ {
+  "no": "22",
+  "title": "WAN側へ送信するパケットに対してシェーピング（優先制御）を行う",
+  "href": "./interface/f70_priq.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/interface/f70_priq.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "f70_priq"
+ },
+ {
+  "no": "24_1",
+  "title": "【ローカルブレイクアウトをお使いになる前にお読みください】LBOの設定",
+  "href": "./lbo/index.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/lbo/index.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "index"
+ },
+ {
+  "no": "25",
+  "title": "アプリケーション毎のLBO設定 ★NEW",
+  "href": "./lbo/index.html#application",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/lbo/index.html#application",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "index"
+ },
+ {
+  "no": "27",
+  "title": "Proxyサーバを利用しないネットワークにおけるLBO（DNS snooping）：Microsoft 365/Microsoft Teams",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "28",
+  "title": "Proxyサーバを利用しないネットワークにおけるLBO（DNS snooping）：Windows Update/Microsoft Update",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "29",
+  "title": "Proxyサーバを利用しないネットワークにおけるLBO（DNS snooping）：Zoom/Webex",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "30",
+  "title": "Proxyサーバを利用しないネットワークにおけるLBO（DNS snooping）：Microsoft 365/ProxyDNSを利用",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "31",
+  "title": "Proxyサーバを利用するネットワークにおけるLBO（HTTP snooping）：Microsoft 365/Microsoft Teams/Zoom",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "32",
+  "title": "Proxyサーバを利用するネットワークにおけるLBO（HTTP snooping）：IPoE固定IPサービスで利用",
+  "href": "./ipoe/static_lbo.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/static_lbo.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static_lbo"
+ },
+ {
+  "no": "33",
+  "title": "Proxyサーバを利用するネットワークにおけるLBO（HTTP snooping）：IPoE動的IPサービスで利用",
+  "href": "./ipoe/mape_lbo.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/mape_lbo.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "mape_lbo"
+ },
+ {
+  "no": "34",
+  "title": "Proxyサーバを利用するネットワークにおけるLBO（HTTP snooping）：Microsoft 365テナント制限",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "52_1",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、IPアドレス固定）",
+  "href": "./ipsec/ipsec-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec-01"
+ },
+ {
+  "no": "53_1",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、拠点IPアドレス不定）",
+  "href": "./ipsec/ipsec-02.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec-02.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec-02"
+ },
+ {
+  "no": "54_1",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、NATトラバーサル、拠点ルータがローカルIPアドレスを利用）",
+  "href": "./ipsec/nat-traversal.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/nat-traversal.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "nat-traversal"
+ },
+ {
+  "no": "55_1",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、電子証明書を利用）",
+  "href": "./ipsec/ipsec-rsa.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec-rsa.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec-rsa"
+ },
+ {
+  "no": "56",
+  "title": "センタ－拠点間をVPN接続する（IKEv2、IPアドレス固定、VPNピア識別：ユーザ名）",
+  "href": "./ipsec/ipsec_ikev2_1.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec_ikev2_1.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec_ikev2_1"
+ },
+ {
+  "no": "57",
+  "title": "センタ－拠点間をVPN接続する（IKEv2、拠点IPアドレス不定、VPNピア識別：FQDN）",
+  "href": "./ipsec/ipsec_ikev2_2.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec_ikev2_2.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec_ikev2_2"
+ },
+ {
+  "no": "58",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、VPN-NATを利用して拠点間IPアドレス重複環境にて通信）",
+  "href": "./ipsec/vpnnat1.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/vpnnat1.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "vpnnat1"
+ },
+ {
+  "no": "59",
+  "title": "センタ－拠点間をVPN接続する（IKEv1、マルチキャストルーティング）",
+  "href": "./ipsec/ipsec-mcast.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ipsec-mcast.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ipsec-mcast"
+ },
+ {
+  "no": "60",
+  "title": "証明書登録手順",
+  "href": "./ipsec/rsa_manual.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/rsa_manual.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "rsa_manual"
+ },
+ {
+  "no": "61",
+  "title": "拠点間をVPN接続する（F60ルートベース-F220ルートベース）",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "62",
+  "title": "拠点間をVPN接続する（F60ポリシーベース-F220ルートベース）",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "64",
+  "title": "マルチポイントSAによる拠点間通信を行う",
+  "href": "./ipsec/mpsa-list.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/mpsa-list.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "mpsa-list"
+ },
+ {
+  "no": "67",
+  "title": "端末からL2TP/IPsecでリモートアクセスする",
+  "href": "./ipsec/l2tp-ipsec_remote.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/l2tp-ipsec_remote.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "l2tp-ipsec_remote"
+ },
+ {
+  "no": "68",
+  "title": "端末からIKEv2でリモートアクセスする",
+  "href": "./ipsec/ikev2_vpn-remote.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipsec/ikev2_vpn-remote.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ikev2_vpn-remote"
+ },
+ {
+  "no": "69",
+  "title": "各社の固定IPサービスでL2TP/IPsecおよびL2TPv3/IPsecを利用する",
+  "href": "./ipoe/static_l2tp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/static_l2tp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static_l2tp"
+ },
+ {
+  "no": "70",
+  "title": "センタ－拠点間をL2 over IPsec接続する（EtherIPを利用）",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "71_1",
+  "title": "センタ－拠点間をL2 over IPsec接続する（L2TPv3を利用）",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "72",
+  "title": "各社の固定IPサービスでL2TP/IPsecおよびL2TPv3/IPsecを利用する",
+  "href": "./ipoe/static_l2tp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/ipoe/static_l2tp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static_l2tp"
+ },
+ {
+  "no": "73",
+  "title": "IPsec：センタ側で回線および装置冗長を行う",
+  "href": "./redundancy/redundancy-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/redundancy/redundancy-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "redundancy-01"
+ },
+ {
+  "no": "76",
+  "title": "IPsec：回線冗長～イベントアクションでバックアップ側経路制御を行う",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "78",
+  "title": "IPsec：センタ側を回線および装置冗長～VRRPプライオリティ減算で切り替えを行う",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "79",
+  "title": "IPsec：センタ側/拠点側を回線および装置冗長～ポリシールーティングとポリシーフラグを利用して負荷分散を行う",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ },
+ {
+  "no": "80_3",
+  "title": "NAPT（IPマスカレード）の設定",
+  "href": "../product/f310/setting/detail/nat+.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/nat+.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "natplus"
+ },
+ {
+  "no": "83_3",
+  "title": "静的フィルタリング",
+  "href": "../product/f310/setting/detail/filter.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/filter.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "filter"
+ },
+ {
+  "no": "84_3",
+  "title": "学習フィルタリング",
+  "href": "../product/f310/setting/detail/sealed.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/sealed.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "sealed"
+ },
+ {
+  "no": "85_3",
+  "title": "DHCPサーバ機能を利用する",
+  "href": "../product/f310/setting/detail/dhcp-server.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/product/f310/setting/detail/dhcp-server.html",
+  "device": "F310",
+  "kind": "detail",
+  "md": "dhcp-server"
+ },
+ {
+  "no": "87_1",
+  "title": "スタティックルーティング",
+  "href": "./routing/static-v4.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/routing/static-v4.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "static-v4"
+ },
+ {
+  "no": "88_1",
+  "title": "RIPv2",
+  "href": "./routing/ripv2.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/routing/ripv2.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ripv2"
+ },
+ {
+  "no": "89_1",
+  "title": "eBGP",
+  "href": "./routing/ebgp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/routing/ebgp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ebgp"
+ },
+ {
+  "no": "90_1",
+  "title": "OSPF",
+  "href": "./routing/ospf.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/routing/ospf.html",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ospf"
+ },
+ {
+  "no": "94",
+  "title": "MIBを取得できるようにする",
+  "href": "./other/mib.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/mib.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "mib"
+ },
+ {
+  "no": "95",
+  "title": "SYSLOGを送信する",
+  "href": "./other/syslog.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/syslog.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "syslog"
+ },
+ {
+  "no": "96",
+  "title": "Trapを送信する",
+  "href": "./other/snmp-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/snmp-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "snmp-01"
+ },
+ {
+  "no": "97",
+  "title": "ログイン認証する",
+  "href": "./other/auth-01.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/auth-01.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "auth-01"
+ },
+ {
+  "no": "98",
+  "title": "上位のユーザレベルへの移行を禁止する",
+  "href": "./other/auth-02.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/auth-02.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "auth-02"
+ },
+ {
+  "no": "99",
+  "title": "設定を許可するユーザを制限する",
+  "href": "./other/auth-03.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/auth-03.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "auth-03"
+ },
+ {
+  "no": "100",
+  "title": "sntpで時刻合わせする",
+  "href": "./other/sntp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/sntp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "sntp"
+ },
+ {
+  "no": "101",
+  "title": "NTP サーバとして動作させる",
+  "href": "./other/f2500_ntp.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/f2500_ntp.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "f2500_ntp"
+ },
+ {
+  "no": "102",
+  "title": "proxyDNSを利用する",
+  "href": "./other/proxydns.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/proxydns.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "proxydns"
+ },
+ {
+  "no": "103",
+  "title": "リゾルバの設定をする",
+  "href": "./other/f2500_resolver.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/f2500_resolver.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "f2500_resolver"
+ },
+ {
+  "no": "104",
+  "title": "SSHで装置にアクセスできるようにする",
+  "href": "./other/ssh.html",
+  "url": "https://www.furukawaelectric.com/fitelnet/setting/other/ssh.html",
+  "device": "F70/F71/F220/F221/F225/F310/F2500/F220 EX/F221 EX",
+  "kind": "detail",
+  "md": "ssh"
+ },
+ {
+  "no": "26",
+  "title": "Proxyサーバを利用しないネットワークにおけるLBO（DNS snooping）：基本設定",
+  "href": "#",
+  "url": "",
+  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
+  "kind": "section",
+  "md": ""
+ }
+]
