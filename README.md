@@ -29,7 +29,7 @@
 Claude Code で:
 
 ```
-/plugin marketplace add <このリポジトリのパスまたは GitHub の owner/repo>
+/plugin marketplace add ShinkoLab/F310_Knowledge_for_Agent
 /plugin install fitelnet-f310@f310-kb
 ```
 
