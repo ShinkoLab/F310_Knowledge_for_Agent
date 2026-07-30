@@ -7,20 +7,20 @@ description: 古河電工 FITELnet F310 ルータの純正マニュアル（全1
 
 古河電工 FITELnet F310（ルータ）の純正マニュアルと公式設定例をローカル検索するためのスキル。
 検索は必ず `lookup.py` を経由する。ページ番号の解決や出典整形が組み込まれている。
-実行時は必ず `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" <サブコマンド> …` の形で呼ぶこと
+実行時は必ず `F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" <サブコマンド> …` の形で呼ぶこと
 （本文中で `lookup.py …` と書いている箇所も、実行時はこのフルパスに読み替える）。
 
 ## 0. 最初に構築状況を確認する
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" status
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" status
 ```
 
 **未構築だった場合**は、ユーザーに「公式サイトから約38MB（マニュアルPDF10冊＋設定例54ページ）を取得して
 知識ベースを構築する」と伝えたうえで実行する。数分かかる。
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
 ```
 
 `mutool` が無いと止まる（`brew install mupdf-tools`）。構築済みなら以降このステップは黙って飛ばす。
@@ -46,22 +46,22 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
 
 ```bash
 # コマンド索引
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "ospf"
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "^router ospf" --full
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "MTU" --desc
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "vrf" --manual cmd_refe_ope
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "ospf"
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "^router ospf" --full
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "MTU" --desc
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "vrf" --manual cmd_refe_ope
 
 # 本文検索（"message.pdf p.414: …" の形で出典付きで返る。対象は省略時 全10冊）
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "link up" message
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "MAP-E" kinou siyou
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "link up" message
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "MAP-E" kinou siyou
 
 # ページ本文（N または N-M）
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 190
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page message 414-415
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 190
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page message 414-415
 
 # 設定例（索引＋本文。完成コンフィグ内のコマンド名でも引ける）
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "v6プラス"
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "dns-snooping"
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "v6プラス"
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "dns-snooping"
 ```
 
 | サブコマンド | 主なオプション |

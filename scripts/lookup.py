@@ -27,6 +27,9 @@ BUILD_HINT = (
 
 def require_kb() -> None:
     if not kb.is_built():
+        hint = kb.legacy_hint()
+        if hint:
+            print(hint, file=sys.stderr)
         print(
             BUILD_HINT.format(script=kb.REPO / "scripts" / "build.py", root=kb.kb_root()),
             file=sys.stderr,
@@ -56,6 +59,9 @@ def cmd_status(args) -> int:
     root = kb.kb_root()
     if not kb.is_built():
         print(f"未構築  KB: {root}")
+        hint = kb.legacy_hint()
+        if hint:
+            print(hint)
         print(BUILD_HINT.format(script=kb.REPO / "scripts" / "build.py", root=root))
         return 2
     idx = load_index()
