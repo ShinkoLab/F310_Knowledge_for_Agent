@@ -34,9 +34,10 @@ data/                 manuals_manifest.json（PDF10冊のURL）, examples_manife
 ### `${CLAUDE_PLUGIN_DATA}` の扱い（重要）
 
 データ置き場のパスは `${CLAUDE_PLUGIN_DATA}` として Claude Code から供給される。id は
-プラグイン識別子 `f310-kb@shinko-lab` の `a-zA-Z0-9_-` 以外を `-` に置換した規則で決まるため、
-`kb_paths.DEFAULT_KB` にハードコードしてある。**プラグイン名かマーケットプレイス名を変えたら
-ここも変えること。**
+プラグイン識別子 `<plugin>@<marketplace>` の `a-zA-Z0-9_-` 以外を `-` に置換した規則で決まる。
+`kb_paths.plugin_data_id()` が `.claude-plugin/{plugin,marketplace}.json` から毎回導出するので、
+**改名しても追随は不要**（定義ファイルは配布物に同梱されるため実行時に読める）。読めない場合だけ
+`FALLBACK_ID` に落ちる。
 
 スキル経由では SKILL.md 内の `${CLAUDE_PLUGIN_DATA}` が展開され、`F310_KB_DIR=…` として
 渡ってくる。プラグイン外で実行した場合は空文字になり `DEFAULT_KB` に落ちるので、どちらの
