@@ -43,7 +43,7 @@ Claude Code で:
 
 ```
 /plugin marketplace add ShinkoLab/F310_Knowledge_for_Agent
-/plugin install fitelnet-f310@f310-kb
+/plugin install f310-kb@shinko-lab
 ```
 
 ## 知識ベースの構築
@@ -87,6 +87,9 @@ python3 scripts/build.py
 ```
 
 削除するときはこのディレクトリごと消してください（`rm -rf ~/.claude/f310-kb`）。再構築すれば元に戻ります。
+なお `~/.claude/f310-kb` はデータ置き場であり、プラグイン本体
+（`~/.claude/plugins/cache/shinko-lab/f310-kb/<version>/`）とは別物です。名前は同じですが消しても
+プラグインはアンインストールされません。
 
 ## 直接使う
 
@@ -104,7 +107,7 @@ python3 scripts/lookup.py ex "v6プラス"              # 設定例検索
 
 ```
 .claude-plugin/     プラグイン定義・マーケットプレース定義
-skills/fitelnet-f310/
+skills/lookup/
   SKILL.md          スキル本体（調べ方の手順・出典ルール）
   references/       マニュアルのルーティング表
 scripts/            取得・変換・索引化・検索

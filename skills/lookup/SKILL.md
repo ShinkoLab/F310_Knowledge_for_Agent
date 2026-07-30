@@ -1,5 +1,5 @@
 ---
-name: fitelnet-f310
+name: lookup
 description: 古河電工 FITELnet F310 ルータの純正マニュアル（全10冊3,873ページ・全1,914コマンド）と公式設定例76件を引くための知識ベース。F310 / FITELnet のコマンド構文や書式、config・コンフィグの作成、show系の運用コマンド、ログ・syslog・エラーメッセージの意味、ハード/ソフト仕様やMIB、IPoE（v6プラス・OCNバーチャルコネクト）・IPsec/VPN・冗長化(VRRP)・OSPF/BGP・QoS・ローカルブレイクアウト(LBO)の設定例を調べるときに使う。
 ---
 

@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 このファイルは、**このリポジトリ自体を保守するとき**の手引きです。
-F310 について調べる手順は `skills/fitelnet-f310/SKILL.md` に一本化してあります（このファイルには書かない）。
+F310 について調べる手順は `skills/lookup/SKILL.md` に一本化してあります（このファイルには書かない）。
 
 ## このリポジトリの性質
 
@@ -16,15 +16,22 @@ Claude Code プラグイン**。リポジトリが持つのは「取得先URL・
 
 ```
 .claude-plugin/       plugin.json / marketplace.json
-skills/fitelnet-f310/ SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
+skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
 scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
                       gen_examples*, build.py（統合）, lookup.py（検索）
 data/                 manuals_manifest.json（PDF10冊のURL）, examples_manifest.json（設定例76件）
 ```
 
 パス解決はすべて `scripts/kb_paths.py` 経由。KBの位置は `$F310_KB_DIR` → `~/.claude/f310-kb` の順で決まる。
-プラグインは `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` にバージョン別展開され
-更新時に入れ替わるため、生成物をプラグイン内に置いてはいけない。
+
+**プラグイン名 `f310-kb` とKBデータ置き場 `~/.claude/f310-kb` は同名だが別物**なので混同しないこと。
+
+| | パス | 性質 |
+|---|---|---|
+| プラグイン本体 | `~/.claude/plugins/cache/shinko-lab/f310-kb/<version>/` | バージョン別展開。更新で入れ替わる |
+| KBデータ | `~/.claude/f310-kb/` | 永続。`build.py` の生成物 |
+
+プラグイン側は更新時に丸ごと入れ替わるため、生成物をプラグイン内に置いてはいけない。
 
 ## 再構築
 
@@ -77,4 +84,4 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
 
 `data/manuals_manifest.json` にURLとページ数を足し、`python3 scripts/build.py --force` で取り直す。
 ページ数が変わったら `scripts/build.py` の `EXPECT_PAGES` と、
-`skills/fitelnet-f310/references/manuals_index.md` の表も更新すること。
+`skills/lookup/references/manuals_index.md` の表も更新すること。
