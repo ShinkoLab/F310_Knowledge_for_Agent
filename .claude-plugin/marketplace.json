@@ -1,11 +1,11 @@
 {
-  "name": "f310-kb",
+  "name": "shinko-lab",
   "owner": {
-    "name": "shinko"
+    "name": "Shinko Lab."
   },
   "plugins": [
     {
-      "name": "fitelnet-f310",
+      "name": "f310-kb",
       "source": "./",
       "description": "FITELnet F310 のマニュアル・設定例をローカル知識ベースとして引くスキル"
     }
