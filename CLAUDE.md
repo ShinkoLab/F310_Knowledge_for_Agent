@@ -8,7 +8,7 @@ F310 について調べる手順は `skills/lookup/SKILL.md` に一本化して�
 ソフトウェアのプロジェクトではなく、**古河電工 FITELnet F310（ルータ）の知識ベースを構築する
 Claude Code プラグイン**。リポジトリが持つのは「取得先URL・変換スクリプト・調べ方の手順」だけで、
 **マニュアル本文・設定例本文は一切含まない**（再配布しないため）。実データは利用者が
-`scripts/build.py` で公式サイトから取得し、KB（既定 `~/.claude/f310-kb`）に構築する。
+`scripts/build.py` で公式サイトから取得し、KB（既定 `~/.claude/plugins/data/f310-kb-shinko-lab`）に構築する。
 
 この方針は意図的なもの。生成物や取得物をリポジトリにコミットしないこと。
 
@@ -22,16 +22,34 @@ scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_i
 data/                 manuals_manifest.json（PDF10冊のURL）, examples_manifest.json（設定例76件）
 ```
 
-パス解決はすべて `scripts/kb_paths.py` 経由。KBの位置は `$F310_KB_DIR` → `~/.claude/f310-kb` の順で決まる。
-
-**プラグイン名 `f310-kb` とKBデータ置き場 `~/.claude/f310-kb` は同名だが別物**なので混同しないこと。
+パス解決はすべて `scripts/kb_paths.py` 経由。KBの位置は `$F310_KB_DIR` → `DEFAULT_KB` の2段で決まる。
 
 | | パス | 性質 |
 |---|---|---|
 | プラグイン本体 | `~/.claude/plugins/cache/shinko-lab/f310-kb/<version>/` | バージョン別展開。更新で入れ替わる |
-| KBデータ | `~/.claude/f310-kb/` | 永続。`build.py` の生成物 |
+| KBデータ | `~/.claude/plugins/data/f310-kb-shinko-lab/` | Claude Code 公式のプラグインデータ置き場。更新をまたいで残る |
 
 プラグイン側は更新時に丸ごと入れ替わるため、生成物をプラグイン内に置いてはいけない。
+
+### `${CLAUDE_PLUGIN_DATA}` の扱い（重要）
+
+データ置き場のパスは `${CLAUDE_PLUGIN_DATA}` として Claude Code から供給される。id は
+プラグイン識別子 `f310-kb@shinko-lab` の `a-zA-Z0-9_-` 以外を `-` に置換した規則で決まるため、
+`kb_paths.DEFAULT_KB` にハードコードしてある。**プラグイン名かマーケットプレイス名を変えたら
+ここも変えること。**
+
+スキル経由では SKILL.md 内の `${CLAUDE_PLUGIN_DATA}` が展開され、`F310_KB_DIR=…` として
+渡ってくる。プラグイン外で実行した場合は空文字になり `DEFAULT_KB` に落ちるので、どちらの
+経路でも同じ場所を指す。
+
+**`CLAUDE_PLUGIN_DATA` を環境変数として直読みしてはいけない。** この変数がプロセスに渡るのは
+hook / MCP / LSP サブプロセスだけで、素の Bash 実行で見える値は他プラグインが自分の値を
+セッション環境変数へ書き出したものであることがある（codex プラグインが実際にそうしている）。
+読むと他プラグインのデータ置き場にKBを書き込む事故になる。
+
+旧パス `~/.claude/f310-kb` に構築済みKBが残っている場合は `kb_paths.legacy_hint()` が
+移行コマンドを案内する。解決順には入れていない（`$F310_KB_DIR` が常に指定される経路では
+到達しないため）。
 
 ## 再構築
 

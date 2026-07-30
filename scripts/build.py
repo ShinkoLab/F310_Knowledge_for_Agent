@@ -5,7 +5,7 @@
   変換: PDF → ページ番号マーカー付き md、HTML → 構造化 md
   索引: コマンド索引 JSON、設定例 INDEX.md
 
-出力先は $F310_KB_DIR、未設定なら ~/.claude/f310-kb。
+出力先は $F310_KB_DIR、未設定なら ~/.claude/plugins/data/f310-kb-shinko-lab。
 依存は python3 と mutool(MuPDF) のみ。pip 不要。
 """
 import argparse
@@ -92,6 +92,15 @@ def main() -> int:
 
     root = kb.kb_root()
     print(f"KB: {root}\n")
+
+    # 旧パスに構築済みKBが残っているなら、38MBを取り直す前に移行を促して止める。
+    # dry-run はURLを見るだけでKBに触らないので対象外。
+    hint = kb.legacy_hint()
+    if hint and not args.dry_run:
+        print(hint, file=sys.stderr)
+        print("移行後にもう一度 build.py を実行してください。"
+              "新規に作り直す場合は旧パスを削除してから再実行してください。", file=sys.stderr)
+        return 2
 
     if args.dry_run:
         print("== URL疎通確認 ==")
