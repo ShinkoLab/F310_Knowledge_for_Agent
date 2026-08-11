@@ -12,3 +12,6 @@ pages/
 __pycache__/
 *.pyc
 .DS_Store
+
+# MCPサーバー用のオプション依存（README「MCP サーバーとして使う」参照）
+.venv-mcp/
