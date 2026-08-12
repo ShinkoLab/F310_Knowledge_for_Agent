@@ -5,12 +5,12 @@
 - 入力は KB/original/*.pdf（無変更）、出力は KB/md/*.md
 """
 import re
-import subprocess
 import sys
 from pathlib import Path
 from typing import Optional   # `int | None` は Python 3.10 以降。3.9 でも import できるようにする
 
 import kb_paths as kb
+import pdf_text
 
 # 3行以上の空行を1行に、行末空白を除去
 _blank = re.compile(r"\n[ \t]*\n[ \t]*\n+")
@@ -24,19 +24,9 @@ def clean(text: str) -> str:
 
 
 def convert(pdf: Path, out_dir: Path) -> tuple[int, int]:
-    # mutool は txt 出力でページ間を \f (form feed) で区切る
-    raw = subprocess.run(
-        ["mutool", "draw", "-F", "txt", "-o", "-", str(pdf)],
-        capture_output=True, check=True,
-    ).stdout.decode("utf-8", errors="replace")
-
-    bodies = [clean(p) for p in raw.split("\f")]
-    # mutool は最終ページの後にも \f を出すので、split の末尾には必ず空要素が1個できる。
-    # 落とすのはこの区切り由来の1個だけ。空である限り消し続けると、最終ページが図版のみの
-    # PDFで実在するページまで落ちてページ数が1つ足りなくなる。途中の空ページを残すのも
-    # 同じ理由（消すと以降の PAGE 番号が全てずれ、出典のページ番号が黙って狂う）。
-    if len(bodies) > 1 and not bodies[-1]:
-        bodies.pop()
+    # 物理ページと1対1。空要素を落としてはいけない。図版だけのページや空ページを詰めると
+    # 以降の PAGE 番号が全てずれ、出典のページ番号が黙って狂う。
+    bodies = [clean(t) for t in pdf_text.page_texts(pdf)]
 
     # source 行は KB ルートからの相対パス（旧レイアウトでは manuals/original/… だった）
     out_lines = [f"# {pdf.name}", "", f"source: original/{pdf.name}", ""]
@@ -62,6 +52,11 @@ def run() -> Optional[int]:
     pdfs = sorted(src.glob("*.pdf"))
     if not pdfs:
         print(f"PDF がありません: {src}（既存のmdをそのまま使います）", file=sys.stderr)
+        return None
+    # 単体実行の入口。build.py は取得の前に同じ確認を済ませている（済んでいれば即座に返る）。
+    err = pdf_text.ensure_available()
+    if err:
+        print(err, file=sys.stderr)
         return None
     print(f"{len(pdfs)} PDF を変換 → {out}\n")
     total_pages = 0

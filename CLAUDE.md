@@ -17,7 +17,7 @@ Claude Code プラグイン**。リポジトリが持つのは「取得先URL・
 ```
 .claude-plugin/       plugin.json / marketplace.json
 skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
-scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
+scripts/              kb_paths, httpget, fetch_*, pdf_text, convert_to_md, build_command_index,
                       gen_examples*, build.py（統合）, lookup.py（検索）
 data/                 manuals_manifest.json（PDF10冊のURL）, examples_manifest.json（設定例76件）
 ```
@@ -71,6 +71,31 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
 | 設定例md | 54件 |
 
 抽出漏れは凡例（マニュアル冒頭のマーカー説明）2件のみで、これは意図的に除外している。
+
+**この件数だけを見て合格としてはいけない。** 抽出器を pypdfium2 に替えたときの実測では、
+和文が `コマン ド リ フ ァ レ ン ス` のように壊れた状態でも件数は 1,299 / 615 のまま一致した。
+件数はテキストの質を何も保証しない。バックエンドや抽出ロジックを変えたら、
+**現行KBの `md/*.md` を正解として、コマンド名の集合と本文を突き合わせること**
+（v2.0.0 時点の実測: ユニークなコマンド名は構成定義編 1,144 / 運用管理編 610）。
+
+## PDFテキスト抽出（`scripts/pdf_text.py`）
+
+バックエンドは pypdfium2（PDFium, BSD-3-Clause）。以前は `mutool`(MuPDF, AGPL) を
+subprocess で呼んでいたが、利用者に AGPL のソフトを brew/apt で入れさせるのを避けて置き換えた。
+
+このリポジトリで pip 依存を持つのはここだけ。`ensure_available()` が
+「実行中のインタプリタ → `<KB>/.venv` → venv を作って install」の順で解決する。
+利用者環境の Python へ pip install はしない。
+
+**和文の擬似スペース除去がこのモジュールの本体**。対象PDFは和文をグリフ単位で配置しており、
+PDFium はその字間を単語区切りと誤認して空白を入れる。放置すると `grep "サービス設定モード"` が
+当たらず、`build_command_index.py` の `【対応フ ァーム ウ ェ アバージ ョ ン】` 読み飛ばしも
+効かなくなって索引の名前が崩れる。PDFium が生成した空白だけを、字送り／文字幅の実測比
+（閾値 2.0）と行位置で判定して落としている。根拠の分布は同ファイル冒頭に書いた。
+**ここの定数を動かすときは、表のセル境界（残すべき空白）まで潰していないか必ず確認すること。**
+
+pypdf・pdfminer.six でも試したが、どちらも同じか、より激しく和文を壊す
+（pdfminer は `【パ ラ メ ー タ 】` となり見出し検出自体が死ぬ）。MuPDF だけが素で正しかった。
 
 ## command_index.json のスキーマ / パーサの前提
 

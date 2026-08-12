@@ -32,8 +32,13 @@ FITELnet および関連する製品名・会社名は、各権利者の商標�
 
 | 依存 | 用途 |
 |---|---|
-| `python3`（3.9 以降） | スクリプト全般（標準ライブラリのみ。pip 不要）。macOS 標準の 3.9 でも動きます |
-| `mutool`（MuPDF） | PDFのテキスト抽出。**ビルド時のみ**必要。`brew install mupdf-tools` / `apt install mupdf-tools` |
+| `python3`（3.9 以降） | スクリプト全般。macOS 標準の 3.9 でも動きます |
+
+外部コマンドの用意は要りません。PDFのテキスト抽出に使う
+[`pypdfium2`](https://github.com/pypdfium2-team/pypdfium2)（PDFium）だけは、
+**初回ビルド時**に知識ベース配下の `.venv` へ自動で導入します（ネットワークが必要）。
+利用者環境の Python には手を入れません。既に `pypdfium2` が import できる環境では、
+そちらをそのまま使い `.venv` は作りません。
 
 テキスト層のあるPDFなのでOCRは不要です。
 
@@ -78,6 +83,7 @@ Claude Code 公式のプラグインデータ置き場（`${CLAUDE_PLUGIN_DATA}`
 ```
 ~/.claude/plugins/data/f310-kb-shinko-lab/
 ├─ .build.json          # 取得日時・Last-Modified・生成件数
+├─ .venv/               # PDF抽出ライブラリ（pypdfium2）の置き場。約20MB
 ├─ original/*.pdf       # 取得したPDF 10冊
 ├─ html/*.html          # 取得した設定例ページ（UTF-8化済）
 └─ md/
@@ -129,4 +135,4 @@ data/               取得先URLと設定例マニフェスト（本文は含ま
 
 ただし、本ツールが利用者の環境で取得・変換する古河電気工業株式会社のマニュアル、設定例、PDF、HTML、Markdown 化テキスト、およびそれらに由来する索引データ・知識ベースは、本ライセンスの対象外です。これらの著作権および利用条件は、古河電工サイトの利用条件および各資料の利用条件に従います。
 
-PDF からのテキスト抽出には、利用者環境にインストールされた MuPDF / `mutool` を外部コマンドとして使用します。MuPDF / `mutool` 自体は本リポジトリには含まれず、本ライセンスの対象外です。MuPDF / `mutool` の利用条件は、その配布元のライセンスに従います。
+PDF からのテキスト抽出には `pypdfium2`（Apache-2.0 / BSD-3-Clause）と、それが同梱する Google PDFium（BSD-3-Clause）を使用します。これらは本リポジトリには含まれず、ビルド時に利用者環境へ導入されるものであり、本ライセンスの対象外です。利用条件は各配布元のライセンスに従います。

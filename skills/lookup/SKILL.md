@@ -23,7 +23,8 @@ F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/looku
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
 ```
 
-`mutool` が無いと止まる（`brew install mupdf-tools`）。構築済みなら以降このステップは黙って飛ばす。
+初回はPDF抽出ライブラリ（`pypdfium2`）をKB配下の `.venv` へ自動導入するため、ネットワークが要る。
+構築済みなら以降このステップは黙って飛ばす。
 
 ## 1. どこを引くか
 

@@ -2,6 +2,30 @@
 
 このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) に従います。
 
+## [2.1.0] - 2026-08-12
+
+PDFのテキスト抽出を MuPDF（AGPL）から PDFium（BSD-3-Clause）へ置き換えました。
+**`mutool` のインストールは不要になりました。**
+
+### 変更
+
+- 抽出バックエンドを `mutool`（MuPDF, AGPL-3.0）から `pypdfium2`（PDFium, BSD-3-Clause）へ変更。
+  外部コマンドの用意が要らなくなり、AGPL のソフトを利用者環境へ入れる必要もなくなった
+- `pypdfium2` は初回ビルド時に `<KB>/.venv` へ自動導入する。既に import できる環境では
+  そちらを使い `.venv` は作らない。利用者環境の Python へ pip install はしない
+- 抽出処理を `scripts/pdf_text.py` に分離。PDFium が和文の字間に挿入する擬似スペース
+  （`コマン ド リ フ ァ レ ン ス`）を、字送りの実測比で判定して除去している
+
+### 影響
+
+- **知識ベースの再構築は必須ではありません。** 構築済みならそのまま使えます。
+  取り直す場合も `python3 scripts/build.py --skip-fetch` で手元のPDFから再生成できます
+- ページ番号は変わりません（3,873ページ・出典の `p.N` はすべて同じ位置を指します）
+- コマンド索引の件数も変わりません（構成定義編 1,299 / 運用管理編 615）。
+  ごく一部のコマンド名で表記の揺れ（`commit ／refresh` → `commit ／ refresh` 等）があります
+- 折り返しで分断されていた入力形式が繋がるようになりました
+  （`{<protocol-number> | <protocol-` + `name>}` → 1行）
+
 ## [2.0.0] - 2026-07-31
 
 プラグインの命名を整理し、KBデータの置き場所を Claude Code 公式のプラグインデータ置き場へ移しました。
@@ -62,5 +86,6 @@ mkdir -p ~/.claude/plugins/data && mv ~/.claude/f310-kb ~/.claude/plugins/data/f
 - 公式サイトからの取得・変換・索引化を行う `scripts/build.py`
 - マニュアル本文・設定例本文はリポジトリに含めず、利用者が各自で構築する方式
 
+[2.1.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.1.0
 [2.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.0.0
 [1.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v1.0.0

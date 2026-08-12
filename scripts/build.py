@@ -6,7 +6,8 @@
   索引: コマンド索引 JSON、設定例 INDEX.md
 
 出力先は $F310_KB_DIR、未設定なら ~/.claude/plugins/data/f310-kb-shinko-lab。
-依存は python3 と mutool(MuPDF) のみ。pip 不要。
+依存は python3 のみ。PDF抽出に使う pypdfium2 だけは KB配下の venv へ自動で用意する
+（詳細は pdf_text.py）。外部コマンドは要らない。
 """
 import argparse
 import shutil
@@ -20,6 +21,7 @@ import fetch_manuals
 import gen_examples
 import gen_examples_index
 import kb_paths as kb
+import pdf_text
 
 # 既知の網羅性。抽出ロジックを変えたときにここが崩れていないかで気付けるようにする。
 EXPECT_PAGES = 3873
@@ -27,16 +29,19 @@ EXPECT_COMMANDS = {"cmd_refe_config": 1299, "cmd_refe_ope": 615}
 EXPECT_EXAMPLES = 54
 
 
-def check_mutool() -> bool:
-    if shutil.which("mutool"):
+def check_pdf_backend(args) -> bool:
+    """PDF抽出の準備。38MBを取りに行く前に確認して、駄目なら先に止める。
+
+    変換する対象が無いときは何もしない。--skip-fetch で設定例だけ作り直す場合に、
+    使いもしないライブラリの導入（＝ネットワークアクセス）を起こさないため。
+    """
+    if args.skip_fetch and not any(kb.original_dir().glob("*.pdf")):
         return True
-    print(
-        "mutool が見つかりません。PDFのテキスト抽出に必要です。\n"
-        "  macOS: brew install mupdf-tools\n"
-        "  Debian/Ubuntu: sudo apt install mupdf-tools",
-        file=sys.stderr,
-    )
-    return False
+    err = pdf_text.ensure_available()
+    if err:
+        print(err, file=sys.stderr)
+        return False
+    return True
 
 
 def seed_from(path: Path) -> int:
@@ -110,11 +115,13 @@ def main() -> int:
         print(f"\n到達不可: {total} 件")
         return 1 if total else 0
 
-    if not check_mutool():
-        return 1
-
+    # seed が先。check_pdf_backend は「変換する対象があるか」を見るので、
+    # 手元PDFを流し込む前に判定すると --skip-fetch --seed で確認を素通りしてしまう。
     if args.seed:
         seed_from(Path(args.seed).expanduser().resolve())
+
+    if not check_pdf_backend(args):
+        return 1
 
     man_failed = ex_failed = man_stale = ex_stale = 0
     if not args.skip_fetch:
