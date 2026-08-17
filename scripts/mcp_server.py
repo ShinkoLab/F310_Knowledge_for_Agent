@@ -18,6 +18,7 @@ lookup.py の cmd_* をそのまま呼び出す（ここでは再実装しない
 """
 import contextlib
 import io
+import threading
 import types
 from typing import List, Optional
 
@@ -45,6 +46,14 @@ INSTRUCTIONS = """古河電工 FITELnet F310 ルータの純正マニュアル�
 mcp = MCPServer("f310-kb", instructions=INSTRUCTIONS)
 
 
+# redirect_stdout/redirect_stderr は sys.stdout/sys.stderr をプロセス全体で
+# 差し替えるが、MCP SDK は同期ツール関数をワーカースレッドで並行実行する。
+# 直列化しないと同時呼び出しどうしが差し替えを奪い合い、結果が入れ替わったり
+# 本文が stdio transport のワイヤに漏れて JSON-RPC が壊れる。
+# 各呼び出しはローカルファイル読みで短いため、素直にロックで直列化する。
+_run_lock = threading.Lock()
+
+
 def _run(fn, ns) -> str:
     """cmd_* を呼び、標準出力/標準エラーへの print をすべて捕まえて文字列で返す。
 
@@ -53,8 +62,9 @@ def _run(fn, ns) -> str:
     """
     buf = io.StringIO()
     try:
-        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
-            fn(ns)
+        with _run_lock:
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                fn(ns)
     except SystemExit:
         pass
     except Exception as e:  # 想定外の例外でサーバプロセスを落とさない

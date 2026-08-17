@@ -34,7 +34,7 @@ FITELnet および関連する製品名・会社名は、各権利者の商標�
 |---|---|
 | `python3`（3.9 以降） | スクリプト全般（標準ライブラリのみ。pip 不要）。macOS 標準の 3.9 でも動きます |
 | `mutool`（MuPDF） | PDFのテキスト抽出。**ビルド時のみ**必要。`brew install mupdf-tools` / `apt install mupdf-tools` |
-| `mcp`（pip, `>=2.0.0,<3`） | **MCPサーバとして使う場合のみ**（OpenCode/Codex向け）。`pip install "mcp>=2.0.0,<3"`。Claude Codeプラグインとしての利用には不要 |
+| `mcp`（pip, `>=2.0.0,<3`） | **MCPサーバとして使う場合のみ**（OpenCode/Codex向け）。`pip install "mcp>=2.0.0,<3"`。**この用途に限り Python 3.10 以降が必要**（mcp SDK 自体の要件。macOS標準の3.9では入りません）。Claude Codeプラグインとしての利用には不要 |
 
 テキスト層のあるPDFなのでOCRは不要です。
 
@@ -131,8 +131,13 @@ python3 scripts/build.py
 macOSのシステム/Homebrew Python では素の `pip install` が `externally-managed-environment`
 エラーになることがあるため、venvを切って使うことを推奨します。
 
+**venvは Python 3.10 以降で作ってください。** `mcp` SDK が 3.10 以上を要求するため、
+macOS標準の 3.9 で venv を作ると `Could not find a version that satisfies mcp>=2.0.0`
+で失敗します（`python3 -V` で確認。3.9 なら `brew install python@3.12` 等で用意し、
+`python3.12 -m venv …` のようにバージョンを明示してください）。
+
 ```bash
-python3 -m venv .venv-mcp
+python3 -m venv .venv-mcp   # python3 は 3.10 以降であること
 .venv-mcp/bin/pip install "mcp>=2.0.0,<3"
 ```
 
