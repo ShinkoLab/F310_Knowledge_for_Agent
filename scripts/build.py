@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """F310 知識ベースを構築する（取得 → 変換 → 索引生成 → 検証）。
 
-  取得: 公式サイトから マニュアルPDF 16冊（うちコンテナ関連6冊）+ 設定例/コンテナ説明書HTML 56件
+  取得: 公式サイトから マニュアルPDF 10冊 + 設定例HTML 54件
   変換: PDF → ページ番号マーカー付き md、HTML → 構造化 md
   索引: コマンド索引 JSON、設定例 INDEX.md
 
@@ -22,9 +22,9 @@ import gen_examples_index
 import kb_paths as kb
 
 # 既知の網羅性。抽出ロジックを変えたときにここが崩れていないかで気付けるようにする。
-EXPECT_PAGES = 3949
+EXPECT_PAGES = 3873
 EXPECT_COMMANDS = {"cmd_refe_config": 1299, "cmd_refe_ope": 615}
-EXPECT_EXAMPLES = 56
+EXPECT_EXAMPLES = 54
 
 
 def check_mutool() -> bool:

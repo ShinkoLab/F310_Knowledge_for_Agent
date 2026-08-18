@@ -1,8 +1,8 @@
 # FITELnet F310 マニュアル索引（ルーティング表）
 
-古河電工 FITELnet F310 の純正マニュアル16冊（うちコンテナ(LXC)関連6冊）を、ページ番号マーカー付きテキストに変換したもの。
+古河電工 FITELnet F310 の純正マニュアル10冊を、ページ番号マーカー付きテキストに変換したもの。
 各ファイルは `===== PAGE N =====`（N = PDF物理ページ）で区切られている。
-実体は KB（`$F310_KB_DIR`、既定 `~/.claude/plugins/data/f310-kb-shinko-lab`）の `md/` 以下。
+実体は KB（`$F310_KB_DIR`、既定 `~/.claude/f310-kb`）の `md/` 以下。
 
 | ファイル | ページ | 収録内容 | こんな時に見る |
 |---|---:|---|---|
@@ -16,20 +16,8 @@
 | `usbband` | 21 | **USB脱落防止（取付）**。オプション品の取付説明 | 「USB脱落防止の付け方」 |
 | `rackmountRMKB010211wb` | 44 | **ラックマウント取付**。RMKB010211取付説明 | 「ラックへの取り付け方」 |
 | `oss_list` | 13 | **OSSライセンス一覧** | 「使用OSSとライセンス」 |
-| `lxc_app_man` | 57 | **コンテナ型仮想環境の使用方法 F版**。コンテナ(LXC)の有効化・イメージ操作・ネットワーク接続・アプリ導入 | 「コンテナの使い方」「container コマンドの手順」 |
-| `softflowd_man` | 6 | **NetFlow(softflowd)の使用方法**。コンテナ上のフローエクスポータ | 「NetFlow/sFlowを出したい」 |
-| `squid_man` | 8 | **Proxyサーバ(squid)の使用方法**。コンテナ上のProxy | 「Proxyを立てたい」 |
-| `lxc_check_change` | 2 | **システムコンテナの確認および変更方法**。旧OS→Alpine Linux の確認・入れ替え手順 | 「コンテナのOSはどっち?」「Alpineに変えたい」 |
-| `lxc_check` | 1 | **システムコンテナの確認方法（旧ファームウェア）**。バージョンアップ前の確認手順 | 「古いFWのままOSを確認したい」 |
-| `alpine_oss` | 2 | **Alpine Linux イメージのOSS一覧**（`oss_list` はルータ本体側。別物） | 「コンテナに入っているOSSとライセンス」 |
 
-合計 3,949ページ。
-
-> コンテナ関連の6冊は公式サイトの
-> [コンテナFITELnet LXCアプリケーション](https://www.furukawaelectric.com/fitelnet/product/container/lxc/)
-> から取得している（F310マニュアルページではない）。`lxc_app_man` / `softflowd_man` / `squid_man` は「説明書」の項、
-> `lxc_check_change` / `lxc_check` / `alpine_oss` は「お知らせ」「Alpine Linuxイメージファイル」の項。
-> いずれも F70/F71/F220/F221/F225/F310/F220 EX/F221 EX 共通の資料。
+合計 3,873ページ。
 
 ## コマンド索引 `md/command_index.json`
 
@@ -55,9 +43,7 @@
 ## 設定例 `md/setting_examples/`
 
 公式サイト `furukawaelectric.com/fitelnet/setting/` から、**対象装置にF310を含む設定例**を抽出したもの。
-索引は `setting_examples/INDEX.md`（全78項目。個別ページ56件＋大ページ内セクション14件＋外部リンク3件）。
-コンテナ(LXC)の説明書HTML 2件（Remote Wireshark / ZTPスクリプト）も、設定例と同じテンプレートのため
-同じ経路で `container_*.md` として生成している。
+索引は `setting_examples/INDEX.md`（全76項目。個別ページ54件＋大ページ内セクション14件＋外部リンク3件）。
 各ファイルは「完成コンフィグ＋設定条件表＋手順＋補足＋出典URL」を収録。
 
 ファイル命名:
@@ -73,7 +59,6 @@
 | `interface_*` | インターフェース / QoS / USBモバイル |
 | `other_*` | 運用管理（SNMP / SYSLOG / 認証 / NTP / SSH） |
 | `lbo_index` | ローカルブレイクアウト集約ページ |
-| `container_*` | コンテナ(LXC)の説明書（Remote Wireshark / ZTP用Pythonスクリプト） |
 
 > 多くの設定例は F70/F220 系との共通ページ（コマンド体系が共通のため）。F310固有ページは `f310_*`。
 > 対象装置欄にF310が含まれることは抽出時に確認済みだが、回答時は各ファイル冒頭の「対象装置」も併せて確認すること。
