@@ -232,7 +232,8 @@ def linearize(html, source_url):
     text = re.sub(r'\n{3,}', '\n\n', text)
     return text.strip()
 
-CATMAP = [('product/f310','F310基本設定'),('ipoe','IPoE / IPv6インターネット'),
+CATMAP = [('product/f310','F310基本設定'),('container/lxc','コンテナ（LXC）'),
+    ('ipoe','IPoE / IPv6インターネット'),
     ('cloud-connect','クラウド接続(VPN)'),('ipsec','IPsec / 拠点間VPN'),
     ('redundancy','冗長化'),('routing','ルーティング'),('lbo','ローカルブレイクアウト'),
     ('interface','インターフェース / QoS / USB'),('other','運用・管理')]
@@ -251,6 +252,10 @@ def outname(u):
     if 'product/f310' in u:
         base = os.path.basename(u).replace('.html','').replace('+','plus')
         return f"f310_{base}.md"
+    # コンテナ(LXC)の説明書。設定例ページと同じテンプレートなので同じ経路で扱える。
+    if '/container/lxc/' in u:
+        base = os.path.basename(u).replace('.html','').replace('+','plus')
+        return f"container_{base}.md"
     return re.sub(r'\W+','_',u)+'.md'
 
 def run(quiet: bool = False) -> int:

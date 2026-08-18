@@ -20,6 +20,8 @@ def outname(u):
         return f"{pre}_{seg.group(2).replace('+','plus')}.md"
     if 'product/f310' in u:
         return "f310_"+os.path.basename(u).replace('.html','').replace('+','plus')+".md"
+    if '/container/lxc/' in u:
+        return "container_"+os.path.basename(u).replace('.html','').replace('+','plus')+".md"
     return ''
 
 # section(no) -> covering file or note
@@ -49,6 +51,7 @@ BUCKETS = [
  ('ルーティング', lambda u:'/routing/' in u),
  ('インターフェース / QoS / USBモバイル', lambda u:'/interface/' in u),
  ('運用・管理（SNMP/SYSLOG/認証/NTP/SSH等）', lambda u:'/other/' in u),
+ ('コンテナ（LXC）アプリケーション', lambda u:'/container/lxc/' in u),
 ]
 
 
@@ -68,7 +71,8 @@ def run() -> int:
     lines.append("")
     lines.append("古河電工 FITELnet の公式サイト「設定例」ページから、**対象装置に F310 を含む設定例**を抽出し、")
     lines.append("各ページの完成コンフィグ・設定条件表・手順・補足を Markdown 化したもの。")
-    lines.append("出典はいずれも `https://www.furukawaelectric.com/fitelnet/setting/` 配下（各ファイル冒頭に出典URL記載）。")
+    lines.append("出典は `https://www.furukawaelectric.com/fitelnet/setting/` 配下、")
+    lines.append("およびコンテナ(LXC)説明書の `.../product/container/lxc/man/` 配下（各ファイル冒頭に出典URL記載）。")
     lines.append("")
     lines.append("- 個別ページを持つ設定例: **{}件**（下表のファイルリンク）".format(len(by_url)))
     lines.append("- 大ページ内のセクション扱い（LBO/冗長の派生）: 索引のみ、本文は集約ファイルを参照")
@@ -135,7 +139,8 @@ def run() -> int:
     lines.append("")
     lines.append("この索引と各 `*.md` は、設定例ページの検索テーブル（`setting_index.html` 内 `<table class=\"list\">`）から")
     lines.append("F310対象行を抽出し、各詳細ページHTML(Shift-JIS)を UTF-8 化 → DOM順リニアライザで生成した。")
-    lines.append("抽出元の全76項目（title / url / device / 分類）はリポジトリの `data/examples_manifest.json` に保持。")
+    lines.append("コンテナ(LXC)の説明書ページ（`container_*.md`）も同じテンプレートのため同じ経路で生成している。")
+    lines.append(f"抽出元の全{len(items)}項目（title / url / device / 分類）はリポジトリの `data/examples_manifest.json` に保持。")
     lines.append("")
 
     out = kb.examples_dir() / "INDEX.md"
