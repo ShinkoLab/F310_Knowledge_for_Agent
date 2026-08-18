@@ -2,6 +2,32 @@
 
 このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) に従います。
 
+## [2.1.0] - 2026-08-18
+
+Claude Code 以外の MCP クライアントからも、同じ知識ベースを引けるようになりました。
+
+### 追加
+
+- `scripts/mcp_server.py`（MCP stdio サーバ）。`lookup.py` の5サブコマンドを
+  `f310_status` / `f310_cmd` / `f310_grep` / `f310_page` / `f310_ex` として公開する。
+  OpenCode・Codex CLI 等から利用できる。検索ロジックは `lookup.py` と共通で、
+  MCPサーバー自身は知識ベースを構築しない（`build.py` は従来どおり別途実行する）
+- `mcp` パッケージ（`>=2.0.0,<3`）への**任意の**依存。MCPサーバーとして使う場合にのみ必要で、
+  **この用途に限り Python 3.10 以降**を要する（`mcp` SDK 自体の要件）。
+  Claude Code プラグインとしての利用には不要
+
+### 変更
+
+- README を再構成。「できること」を冒頭に置き、導入手順を「クイックスタート」へ集約、
+  分散していた非公式表示・再配布・ライセンスの記述を末尾の「権利・再配布について」へ統合した
+
+### 変更していないもの
+
+- 取得元URL・変換ロジック・コマンド索引の中身（網羅性は 3,873ページ / 1,914コマンド /
+  設定例54件のまま）。**知識ベースの再構築は不要**
+- Claude Code から使う場合の依存（`python3` と `mutool` のみ。pip 不要）
+- スキルの `description`（自動起動の判定に使われるため）
+
 ## [2.0.0] - 2026-07-31
 
 プラグインの命名を整理し、KBデータの置き場所を Claude Code 公式のプラグインデータ置き場へ移しました。
@@ -62,5 +88,6 @@ mkdir -p ~/.claude/plugins/data && mv ~/.claude/f310-kb ~/.claude/plugins/data/f
 - 公式サイトからの取得・変換・索引化を行う `scripts/build.py`
 - マニュアル本文・設定例本文はリポジトリに含めず、利用者が各自で構築する方式
 
+[2.1.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.1.0
 [2.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.0.0
 [1.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v1.0.0
