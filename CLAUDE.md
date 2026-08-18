@@ -18,7 +18,8 @@ Claude Code プラグイン**。リポジトリが持つのは「取得先URL・
 .claude-plugin/       plugin.json / marketplace.json
 skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
 scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
-                      gen_examples*, build.py（統合）, lookup.py（検索）
+                      gen_examples*, build.py（統合）, lookup.py（検索）,
+                      mcp_server.py（MCP stdio サーバ。lookup.py の cmd_* を薄くラップ。任意・pip依存）
 data/                 manuals_manifest.json（PDF10冊のURL）, examples_manifest.json（設定例76件）
 ```
 
