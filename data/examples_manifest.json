@@ -682,23 +682,5 @@
   "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
   "kind": "section",
   "md": ""
- },
- {
-  "no": "C1",
-  "title": "遠隔拠点からパケットキャプチャを行う（Remote Wireshark）",
-  "href": "./remote-wireshark.html",
-  "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/remote-wireshark.html",
-  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
-  "kind": "detail",
-  "md": "remote-wireshark"
- },
- {
-  "no": "C2",
-  "title": "PythonスクリプトでZTP（ゼロタッチプロビジョニング）を行う",
-  "href": "./ztp-script.html",
-  "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/ztp-script.html",
-  "device": "F70/F71/F220/F221/F225/F310/F220 EX/F221 EX",
-  "kind": "detail",
-  "md": "ztp-script"
  }
 ]

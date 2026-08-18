@@ -1,6 +1,6 @@
 {
   "source": "https://www.furukawaelectric.com/fitelnet/product/f310/manual/",
-  "note": "FITELnet F310 純正マニュアルの取得先。本リポジトリはPDF本体を含まない。利用者が build.py で公式サイトから取得する。pages は取得物の健全性確認に使う想定ページ数。source を持つエントリは source の掲載ページから取得する（コンテナ(LXC)説明書など、F310マニュアルページ以外のもの）。",
+  "note": "FITELnet F310 純正マニュアルの取得先。本リポジトリはPDF本体を含まない。利用者が build.py で公式サイトから取得する。pages は取得物の健全性確認に使う想定ページ数。",
   "manuals": [
     {
       "file": "goriyouF310.pdf",
@@ -61,48 +61,6 @@
       "title": "USB脱落防止バンド取付説明書",
       "url": "https://www.furukawaelectric.com/fitelnet/f/man/option/pdf/usbband.pdf",
       "pages": 21
-    },
-  {
-    "file": "lxc_app_man.pdf",
-    "title": "コンテナ型仮想環境の使用方法 F版",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/lxc_app_man.pdf",
-    "pages": 57,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  },
-  {
-    "file": "softflowd_man.pdf",
-    "title": "NetFlow(softflowd)の使用方法について",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/softflowd_man.pdf",
-    "pages": 6,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  },
-  {
-    "file": "squid_man.pdf",
-    "title": "Proxyサーバ(squid)の使用方法について",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/squid_man.pdf",
-    "pages": 8,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  },
-  {
-    "file": "lxc_check_change.pdf",
-    "title": "システムコンテナの確認および変更方法",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/lxc_check_change.pdf",
-    "pages": 2,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  },
-  {
-    "file": "lxc_check.pdf",
-    "title": "システムコンテナの確認方法（旧ファームウェア）",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/lxc_check.pdf",
-    "pages": 1,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  },
-  {
-    "file": "alpine_oss.pdf",
-    "title": "Alpine Linux イメージファイルのOSS一覧",
-    "url": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/man/alpine_oss.pdf",
-    "pages": 2,
-    "source": "https://www.furukawaelectric.com/fitelnet/product/container/lxc/"
-  }
+    }
   ]
 }
