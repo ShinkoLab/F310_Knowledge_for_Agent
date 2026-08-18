@@ -61,6 +61,44 @@ def table_to_md(tbl):
         md.append('| '+' | '.join(r)+' |')
     return '\n'.join(md)
 
+_BR = re.compile(r'<br\s*/?>[ \t]*\r?\n?', re.I)
+
+
+def block_text(x):
+    """<br>区切りの塊を、行構造を保ったままテキストにする。
+
+    collapse() と違い行頭のインデント（半角/全角スペース）を潰さない。コンフィグや
+    コンソール出力はインデントが意味を持つため。<br> 直後の改行は元HTMLの整形由来なので
+    一緒に食う（残すと1行おきに空行が入る）。
+    """
+    x = _BR.sub('\n', x)
+    x = re.sub(r'<[^>]+>', '', x)
+    x = ht.unescape(x).replace('\r', '')
+    return '\n'.join(ln.rstrip() for ln in x.split('\n')).strip('\n')
+
+
+def table_as_code(tbl):
+    """コンフィグ／コンソール出力が入っただけの表を (ラベル, コード) で返す。作れなければ None。
+
+    データセルが1つだけで中身が <br> 区切りの複数行、という形の表が対象。
+    設定例ページの一部とコンテナ(LXC)の説明書は、完成コンフィグをこの形で置いている。
+    表のままにすると table_to_md() が改行を空白に潰し、1行に繋がった使えないconfigになる。
+    """
+    cells, label = [], ''
+    for r in re.findall(r'<tr[^>]*>(.*?)</tr>', tbl, re.S|re.I):
+        for m in re.finditer(r'<(td|th)[^>]*>(.*?)</\1>', r, re.S|re.I):
+            if m.group(1).lower() == 'th':
+                label = label or collapse(m.group(2))
+            else:
+                cells.append(m.group(2))
+    if len(cells) != 1 or not _BR.search(cells[0]):
+        return None
+    code = block_text(cells[0])
+    if code.count('\n') < 1:
+        return None
+    return label, code
+
+
 def is_nav_table(tbl):
     # skip tables that are basically navigation (mostly links, little text)
     txt = collapse(tbl)
@@ -100,6 +138,9 @@ def pre_label(tid, heading):
     return None
 
 
+MARKER_RE = re.compile(r'class="(?:title|summary|envname|additional_title|additional_detail)"', re.I)
+
+
 def linearize(html, source_url):
     body = re.search(r'<body[^>]*>(.*)</body>', html, re.S|re.I)
     b = body.group(1) if body else html
@@ -108,7 +149,23 @@ def linearize(html, source_url):
     b = re.sub(r'<!--.*?-->', '', b, flags=re.S)
     # limit to main editable content: from first content marker to footer/pagetop
     # cut off trailing site footer if present
-    for marker in ['class="pagetop"', 'id="footer"', 'class="footer"', 'FITELnetサイトマップ']:
+    # 設定例ページは本文を .title/.summary/.envname で持つ。同じサイトでもこのテンプレートを
+    # 使わず本文が素の <p>/<li> に入っているページがあり（コンテナ(LXC)の説明書など）、
+    # そこでは上のパターンだけでは手順の説明文が丸ごと落ちる（見出しだけが残り、空見出し除去で
+    # その見出しも消える）。マーカーが1つも無いページに限って <p>/<li> も拾うフォールバックに
+    # 切り替える。マーカーを持つページの生成物は従来のまま変わらない。
+    prose = not MARKER_RE.search(b)
+    if prose:
+        # ヘッダ・グローバルナビの <p>/<li> を拾わないよう本文領域に絞る。
+        # フッタ切り落としより先に行うこと。先に切ると、切り落とし位置が </main> より前に
+        # 来たページで閉じタグごと消え、絞り込みが効かずにナビが本文に混ざる。
+        m = re.search(r'<main[^>]*>(.*?)</main>', b, re.S|re.I) or re.search(r'<main[^>]*>(.*)', b, re.S|re.I)
+        if m:
+            b = m.group(1)
+    # 'ページの先頭へ' は class="pagetop" を持たないページがあるため文言でも切る
+    # （この行より後ろは関連リンクとフッタで、本文ではない）
+    for marker in ['class="pagetop"', 'id="footer"', 'class="footer"',
+                   'ページの先頭へ', 'FITELnetサイトマップ']:
         i = b.find(marker)
         if i>0: b = b[:i]
     # Build a list of (pos, kind, payload)
@@ -124,6 +181,8 @@ def linearize(html, source_url):
         ('table', r'<table[^>]*>(.*?)</table>'),
         ('img', r'<img[^>]+>'),
     ]
+    if prose:
+        patterns += [('p', r'<p\b[^>]*>(.*?)</p>'), ('li', r'<li\b[^>]*>(.*?)</li>')]
     for kind, pat in patterns:
         for m in re.finditer(pat, b, re.S|re.I):
             if kind=='h':
@@ -141,6 +200,13 @@ def linearize(html, source_url):
         if any(k in src.lower() for k in ('icon','btn','arrow','logo','spacer','bullet','.svg','common/img','/parts/')):
             continue
         events.append((m.start(), 'img', (src, alt)))
+    # 表やコードブロックの中の <p>/<li> は、その塊として既に出るので二重に採らない
+    if prose:
+        blocked = [(m.start(), m.end())
+                   for m in re.finditer(r'<(table|pre)\b.*?</\1>', b, re.S|re.I)]
+        events = [e for e in events
+                  if e[1] not in ('p', 'li')
+                  or not any(bs <= e[0] < be for bs, be in blocked)]
     events.sort(key=lambda e: e[0])
 
     # <pre> がどの textarea に属するかの対応表（ラベル復元に使う）
@@ -200,8 +266,23 @@ def linearize(html, source_url):
             label = pre_label(textarea_id_at(pos), recent_heading)
             if label: push('\n'+label)
             push('\n```'); push(code); push('```\n'); last_heading=None
+        elif kind=='p':
+            t = collapse(payload)
+            if t: push(t+'\n'); last_heading=None
+        elif kind=='li':
+            t = collapse(payload).replace('\n', ' ')
+            if not t: continue
+            if not (md and md[-1].startswith('- ')):
+                push('')          # 直前が箇条書きでなければ、リストの前に空行を置く
+            push('- '+t); last_heading=None
         elif kind=='table':
             if is_nav_table(payload): continue
+            code = table_as_code(payload)
+            if code:
+                label, body_code = code
+                if label: push('\n**'+label+'**:')
+                push('\n```'); push(body_code); push('```\n'); last_heading=None
+                continue
             md_t = table_to_md(payload)
             if md_t and md_t.count('\n')>=2:
                 push('\n'+md_t+'\n'); last_heading=None
@@ -232,7 +313,8 @@ def linearize(html, source_url):
     text = re.sub(r'\n{3,}', '\n\n', text)
     return text.strip()
 
-CATMAP = [('product/f310','F310基本設定'),('ipoe','IPoE / IPv6インターネット'),
+CATMAP = [('product/f310','F310基本設定'),('container/lxc','コンテナ（LXC）'),
+    ('ipoe','IPoE / IPv6インターネット'),
     ('cloud-connect','クラウド接続(VPN)'),('ipsec','IPsec / 拠点間VPN'),
     ('redundancy','冗長化'),('routing','ルーティング'),('lbo','ローカルブレイクアウト'),
     ('interface','インターフェース / QoS / USB'),('other','運用・管理')]
@@ -251,6 +333,10 @@ def outname(u):
     if 'product/f310' in u:
         base = os.path.basename(u).replace('.html','').replace('+','plus')
         return f"f310_{base}.md"
+    # コンテナ(LXC)の説明書。設定例ページと同じテンプレートなので同じ経路で扱える。
+    if '/container/lxc/' in u:
+        base = os.path.basename(u).replace('.html','').replace('+','plus')
+        return f"container_{base}.md"
     return re.sub(r'\W+','_',u)+'.md'
 
 def run(quiet: bool = False) -> int:

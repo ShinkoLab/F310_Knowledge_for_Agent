@@ -19,7 +19,7 @@ import sys
 import kb_paths as kb
 
 BUILD_HINT = (
-    "知識ベースが未構築です。次のコマンドで構築してください（公式サイトから約38MBを取得します）:\n"
+    "知識ベースが未構築です。次のコマンドで構築してください（公式サイトから約48MBを取得します）:\n"
     "    python3 {script}\n"
     "  出力先: {root}"
 )

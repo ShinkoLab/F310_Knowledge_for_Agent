@@ -20,7 +20,7 @@ skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.m
 scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
                       gen_examples*, build.py（統合）, lookup.py（検索）,
                       mcp_server.py（MCP stdio サーバ。lookup.py の cmd_* を薄くラップ。任意・pip依存）
-data/                 manuals_manifest.json（PDF10冊のURL）, examples_manifest.json（設定例76件）
+data/                 manuals_manifest.json（PDF16冊のURL）, examples_manifest.json（設定例・コンテナ説明書78件）
 ```
 
 パス解決はすべて `scripts/kb_paths.py` 経由。KBの位置は `$F310_KB_DIR` → `DEFAULT_KB` の2段で決まる。
@@ -67,11 +67,15 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
 
 | 項目 | 値 |
 |---|---|
-| 総ページ数 | 3,873 |
+| 総ページ数 | 3,949（マニュアル10冊 3,873 + コンテナ関連6冊 76） |
 | コマンド数 | 構成定義編 1,299 / 運用管理編 615（計1,914） |
-| 設定例md | 54件 |
+| 設定例md | 56件（うちコンテナ説明書HTML 2件） |
 
 抽出漏れは凡例（マニュアル冒頭のマーカー説明）2件のみで、これは意図的に除外している。
+
+この表の数値を `skills/lookup/SKILL.md` の `description` に書かないこと。自動起動の判定に効くのは
+固有名（`v6プラス`・`softflowd`・`squid` 等）であって数値ではなく、書くと内容を足すたびに
+description の更新が必要になる。規模を示すのは README と `manuals_index.md` の役割。
 
 ## command_index.json のスキーマ / パーサの前提
 
@@ -92,6 +96,16 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
 - 元ページは **Shift_JIS**。`fetch_examples.py` が cp932 で解釈してUTF-8で保存する。
 - `KB/html` のファイル名は `kb_paths.page_key()` が決める。取得側と生成側で規則がずれると
   `MISSING` になるので、変えるなら両方が同じ関数を使い続けること。
+- `gen_examples.py` のリニアライザには、テンプレート違いのページ向けに2つの分岐がある。
+  どちらも**マーカー（`.title`/`.summary`/`.envname`/`.additional_*`）を持つページの出力は変えない**ので、
+  触るときは既存の生成物が変化しないことを diff で確認すること。
+  - **prose フォールバック**: マーカーが1つも無いページでは `<p>`/`<li>` も拾う。この分岐に入るページは
+    先に `<main>` の中身へ絞る（ヘッダ・グローバルナビの `<p>`/`<li>` を巻き込まないため）。
+    絞り込みはフッタ切り落としより**先**に行う。後にすると、切り落とし位置が `</main>` より前に来た
+    ページで閉じタグごと消え、絞り込みが効かずナビが本文に混ざる。
+  - **`table_as_code()`**: データセル1つだけ・中身が `<br>` 区切り複数行、という表を code fence にする。
+    完成コンフィグやコンソール出力がこの形で置かれているページがあり、表のままだと `table_to_md()` が
+    改行を空白に潰して1行に繋がった使えないconfigになる。
 - `gen_examples.py` のリニアライザ（DOM順に title/summary/envname/table/pre/img を拾う）と
   `gen_examples_index.py` の SECT・NOPAGE マップは、サイトを見ながら人手で確定させたもの。
   自動判定できないため手で保守する。
@@ -99,6 +113,25 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
   id からラベル（`DNS snooping ／ app-profile（新コマンド体系）` 等）を復元している。
   id の付き方は `command_app_dns_teams`（新体系）/ `command_dns_teams`（旧体系・接頭辞なし）。
   センタ/拠点の別（`_center` / `_kyoten`）も同様に復元するが、HTML側に既に見出しがある場合は重複させない。
+
+## コンテナ(LXC)ドキュメントの扱い
+
+取得元は F310 マニュアルページではなく
+<https://www.furukawaelectric.com/fitelnet/product/container/lxc/>。F70/F220系と共通の資料で、
+F310 は V01.00 以降が対応。パイプラインは既存のものをそのまま使い、新しい経路は作っていない。
+
+- PDF 6冊は `manuals_manifest.json` に追加。「説明書」の項が `lxc_app_man` 57p / `softflowd_man` 6p /
+  `squid_man` 8p、「お知らせ」「Alpine Linuxイメージファイル」の項が `lxc_check_change` 2p / `lxc_check` 1p /
+  `alpine_oss` 2p。F310マニュアルページ以外から取るエントリには `source` キーで掲載ページを持たせている
+  （取得処理は使わない。出所の記録用）。`alpine_oss` はコンテナイメージのOSS一覧で、ルータ本体の `oss_list` とは別物。
+- HTML 2件（`remote-wireshark` / `ztp-script`）は `examples_manifest.json` に `kind: detail` で追加し、
+  既存のリニアライザで `container_*.md` として生成する。`no` は `C1`/`C2`（SECT/NOPAGE の数字キーと
+  衝突させないため）。分類は `gen_examples.py` の CATMAP と `gen_examples_index.py` の BUCKETS の
+  `/container/lxc/` 判定で決まる。
+  **ただし設定例ページのテンプレート（`.title`/`.summary`/`.envname`）は使っていない。**
+  本文が素の `<p>`/`<li>` に入っているため、下記のフォールバックが無いと手順の説明文が丸ごと落ちる。
+- 説明書の `speedtest.html`（回線速度測定）は**サイト側が404**でリンク切れのため未収録。復活したら
+  examples_manifest に1行足すだけで入る。
 
 ## マニュアルPDFを差し替え・追加するとき
 

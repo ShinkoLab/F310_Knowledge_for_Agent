@@ -2,6 +2,64 @@
 
 このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) に従います。
 
+## [2.2.0] - 2026-08-18
+
+コンテナ（LXC）関連の公式ドキュメントを知識ベースに取り込みました。取得元は
+[コンテナFITELnet LXCアプリケーション](https://www.furukawaelectric.com/fitelnet/product/container/lxc/)
+です（F70/F220系と共通の資料。F310 は V01.00 以降が対応）。
+
+> [!IMPORTANT]
+> **知識ベースの再構築が必要です。** 追加分だけを取得するので数十秒で終わります。
+> ```bash
+> python3 scripts/build.py
+> ```
+> 未実施のままだと `status` の値が旧来のまま（10冊 / 3,873ページ / 設定例54件）になり、
+> 下記「修正」で復活した既存設定例の本文も反映されません。
+
+### 追加
+
+- マニュアルPDF 6冊。`lookup.py grep` / `page` の対象に加わる
+  - 「説明書」の項
+    - `lxc_app_man`（57p）コンテナ型仮想環境の使用方法 F版
+    - `softflowd_man`（6p）NetFlow(softflowd) の使用方法
+    - `squid_man`（8p）Proxyサーバ(squid) の使用方法
+  - 「お知らせ」「Alpine Linuxイメージファイル」の項
+    - `lxc_check_change`（2p）システムコンテナの確認および変更方法（旧OS→Alpine Linux）
+    - `lxc_check`（1p）システムコンテナの確認方法（旧ファームウェア）
+    - `alpine_oss`（2p）Alpine Linux イメージのOSS一覧（ルータ本体の `oss_list` とは別物）
+- 説明書HTML 2件を `container_*.md` として生成。`lookup.py ex` で引ける
+  - `container_remote-wireshark.md` 遠隔拠点からのパケットキャプチャ（Remote Wireshark）
+  - `container_ztp-script.md` PythonスクリプトによるZTP（ゼロタッチプロビジョニング）
+- 設定例索引（`INDEX.md`）に「コンテナ（LXC）アプリケーション」の分類
+
+### 修正
+
+- 設定例リニアライザが、設定例ページのテンプレート（`.title`/`.summary`/`.envname`）を使っていない
+  ページで**本文を丸ごと落としていた**問題を修正。見出しだけが残り、空見出し除去でその見出しごと
+  消えるため、生成物では手順が飛んでいた（Remote Wireshark なら手順2・3・5と前提条件・注意点が欠落）。
+  マーカーが1つも無いページに限って `<p>`/`<li>` も拾うフォールバックを追加した
+- 完成コンフィグやコンソール出力が「1セルだけの表」に入っているページで、表のまま整形した結果
+  **改行が空白に潰れて1行に繋がり、コピーしても使えないconfig**になっていた問題を修正。
+  この形の表は code fence として出すようにした
+- 上記2件により、コンテナ説明書2件に加えて**既存の設定例14件でも本文が復活**した
+  （`lbo_index` の app-profile 推奨理由、各IPoE設定例の対応バージョン注記など）。
+  マーカーを持つページの出力は変わらない
+
+### 変更
+
+- 網羅性の基準値: **3,949ページ / 1,914コマンド / 設定例56件**（コマンド索引の中身は不変）
+- スキルの `description` にコンテナ（LXC / Alpine Linux / softflowd / squid / Remote Wireshark / ZTP）の
+  語を追加。コンテナの質問でもスキルが起動するようにするため
+- あわせて `description` から規模の数値（冊数・ページ数・コマンド数・設定例件数）を削除。
+  自動起動の判定には効かない一方、内容を足すたびに書き換えが要る。規模は README と
+  `manuals_index.md` が持つ
+
+### 既知の未収録
+
+- 説明書の「回線速度を測定する（speedtest-cli）」は、リンク先
+  `.../lxc/man/speedtest.html` が公式サイト側で 404 のため収録できていません。
+  復活すれば `data/examples_manifest.json` に1行追加するだけで取り込めます
+
 ## [2.1.0] - 2026-08-18
 
 Claude Code 以外の MCP クライアントからも、同じ知識ベースを引けるようになりました。
@@ -88,6 +146,7 @@ mkdir -p ~/.claude/plugins/data && mv ~/.claude/f310-kb ~/.claude/plugins/data/f
 - 公式サイトからの取得・変換・索引化を行う `scripts/build.py`
 - マニュアル本文・設定例本文はリポジトリに含めず、利用者が各自で構築する方式
 
+[2.2.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.2.0
 [2.1.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.1.0
 [2.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v2.0.0
 [1.0.0]: https://github.com/ShinkoLab/F310_Knowledge_for_Agent/releases/tag/v1.0.0

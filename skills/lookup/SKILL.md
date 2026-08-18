@@ -1,6 +1,6 @@
 ---
 name: lookup
-description: 古河電工 FITELnet F310 ルータの純正マニュアル（全10冊3,873ページ・全1,914コマンド）と公式設定例76件を引くための知識ベース。F310 / FITELnet のコマンド構文や書式、config・コンフィグの作成、show系の運用コマンド、ログ・syslog・エラーメッセージの意味、ハード/ソフト仕様やMIB、IPoE（v6プラス・OCNバーチャルコネクト）・IPsec/VPN・冗長化(VRRP)・OSPF/BGP・QoS・ローカルブレイクアウト(LBO)の設定例を調べるときに使う。
+description: 古河電工 FITELnet F310 ルータの純正マニュアルと公式設定例・コンテナ説明書を引くための知識ベース。F310 / FITELnet のコマンド構文や書式、config・コンフィグの作成、show系の運用コマンド、ログ・syslog・エラーメッセージの意味、ハード/ソフト仕様やMIB、IPoE（v6プラス・OCNバーチャルコネクト）・IPsec/VPN・冗長化(VRRP)・OSPF/BGP・QoS・ローカルブレイクアウト(LBO)の設定例、コンテナ（LXC / Alpine Linux）とNetFlow(softflowd)・Proxy(squid)・Remote Wireshark・ZTP を調べるときに使う。
 ---
 
 # FITELnet F310 知識ベース
@@ -16,8 +16,8 @@ description: 古河電工 FITELnet F310 ルータの純正マニュアル（全1
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" status
 ```
 
-**未構築だった場合**は、ユーザーに「公式サイトから約38MB（マニュアルPDF10冊＋設定例54ページ）を取得して
-知識ベースを構築する」と伝えたうえで実行する。数分かかる。
+**未構築だった場合**は、ユーザーに「公式サイトから約48MB（マニュアルPDF16冊＋設定例・コンテナ説明書56ページ）を
+取得して知識ベースを構築する」と伝えたうえで実行する。数分かかる。
 
 ```bash
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
@@ -35,6 +35,8 @@ F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build
 | 「対応本数・性能値は?」「MIB/Trapは?」 | `lookup.py grep "<語>" siyou` |
 | 「この機能は何をする?」 | `lookup.py grep "<語>" kinou` |
 | 「動かない、切り分けたい」 | `lookup.py grep "<症状>" trouble` |
+| 「コンテナ(LXC)の使い方は?」「コンテナでNetFlow/Proxyを動かしたい」 | `lookup.py grep "<語>" lxc_app_man softflowd_man squid_man`、`lookup.py ex "コンテナ"` |
+| 「コンテナのOSは旧OS/Alpineどっち?」「入っているOSSは?」 | `lookup.py page lxc_check_change 1-2`、`lookup.py grep "<パッケージ名>" alpine_oss` |
 
 マニュアル＝**コマンド書式の正典**、設定例＝**動く設定の実例集**。用途で使い分ける。
 どのマニュアルに何が載るかの詳細は `references/manuals_index.md` を読む。
@@ -51,9 +53,10 @@ F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/looku
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "MTU" --desc
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "vrf" --manual cmd_refe_ope
 
-# 本文検索（"message.pdf p.414: …" の形で出典付きで返る。対象は省略時 全10冊）
+# 本文検索（"message.pdf p.414: …" の形で出典付きで返る。対象は省略時 全16冊）
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "link up" message
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "MAP-E" kinou siyou
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "container enable" lxc_app_man
 
 # ページ本文（N または N-M）
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 190
@@ -96,6 +99,10 @@ PDFを開く必要があるのは、構成図・写真などテキストに無�
 - **F310以外の設定例が混ざる**: 設定例の多くは F70/F220系との共通ページ。各ファイルの「対象装置」欄に
   F310が含まれることを確認してから提示する。
 - **同名コマンドは動作モード違い**: `set mtu`・`description` 等は複数エントリある。どのモードのものかを明示する。
+- **コンテナの説明書は複数機種共通**: `lxc_app_man` / `softflowd_man` / `squid_man` と `container_*.md` は
+  F70/F220系と共通の資料。設定例中のホスト名やインタフェース番号が他機種のものになっていることがあるので、
+  F310の構成に読み替えて提示する。コンテナ関連コマンドの正典は従来どおりコマンドリファレンス（`lookup.py cmd "^container"`）で、
+  `container backup` / `container restore` / `container image` 等は説明書側に記載が無い（`lxc_app_man` を grep しても当たらない）。
 - **LBOには新旧2つのコマンド体系がある**: 設定例では `app-profile（新コマンド体系）` と
   `lbo-profile（旧コマンド体系）` が併記されている。どちらの体系かを明示して提示する。
 - 推測でコマンドを作らない。索引に無い構文は「マニュアルに記載が見つからない」と答える。

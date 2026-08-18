@@ -1,6 +1,6 @@
 # FITELnet F310 Knowledge for Agent
 
-古河電工 **FITELnet F310**（ルータ）の純正マニュアル10冊と公式設定例を、Claude Code から
+古河電工 **FITELnet F310**（ルータ）の純正マニュアル16冊と公式設定例・コンテナ(LXC)ドキュメントを、Claude Code から
 検索できる知識ベースにするプラグインです。コマンドの書式・config の組み方・ログの意味を、
 **出典（マニュアル名とページ番号／設定例のURL）付き**で答えられるようになります。
 
@@ -16,14 +16,15 @@
 - 「F310 で v6プラスの固定IPサービスを使う設定例を出して」 → 公式設定例から config を提示
 - 「`router ospf` の入力形式は？」 → コマンドリファレンスの構文・動作モード・掲載ページ
 - 「このログの `LINK UP` は何を意味する？」 → メッセージ一覧の該当ページ本文
+- 「コンテナ(LXC)で squid を動かす手順は？」 → コンテナ説明書の該当ページ本文
 
 引ける範囲は次のとおりです。
 
 | 対象 | 規模 |
 |---|---|
-| 純正マニュアル | 10冊 / 3,873ページ |
+| 純正マニュアル | 16冊 / 3,949ページ（コンテナ(LXC)関連6冊を含む） |
 | コマンド索引 | 1,914コマンド（構成定義編 1,299 + 運用管理編 615） |
-| 公式設定例 | 54件（IPoE・IPsec/VPN・VRRP・OSPF/BGP・QoS・LBO ほか） |
+| 公式設定例・コンテナ説明書 | 56件（IPoE・IPsec/VPN・VRRP・OSPF/BGP・QoS・LBO・コンテナ ほか） |
 
 ## クイックスタート
 
@@ -54,7 +55,7 @@ Claude Code で:
 python3 scripts/build.py
 ```
 
-公式サイトからマニュアルPDF 10冊（約38MB）と設定例ページ 54件を取得し、変換・索引化します。
+公式サイトからマニュアルPDF 16冊（約45MB）と設定例・コンテナ説明書ページ 56件を取得し、変換・索引化します。
 サイトへの負荷を避けて逐次・1秒間隔で取得するため、初回は数分かかります。
 
 ## 知識ベース
@@ -67,12 +68,12 @@ Claude Code 公式のプラグインデータ置き場（`${CLAUDE_PLUGIN_DATA}`
 ```
 ~/.claude/plugins/data/f310-kb-shinko-lab/
 ├─ .build.json            # 取得日時・Last-Modified・生成件数
-├─ original/*.pdf         # 取得したPDF 10冊
-├─ html/*.html            # 取得した設定例ページ（UTF-8化済）
+├─ original/*.pdf         # 取得したPDF 16冊
+├─ html/*.html            # 取得した設定例・コンテナ説明書ページ（UTF-8化済）
 └─ md/
    ├─ *.md                # ページ番号マーカー付き全文
    ├─ command_index.json  # 全1,914コマンドの索引
-   └─ setting_examples/   # 設定例54件 + INDEX.md
+   └─ setting_examples/   # 設定例・コンテナ説明書56件 + INDEX.md
 ```
 
 別の場所に置きたいときは環境変数 `$F310_KB_DIR` で上書きできます。
@@ -90,7 +91,7 @@ Claude Code 公式のプラグインデータ置き場（`${CLAUDE_PLUGIN_DATA}`
 | `--seed DIR` | 手元にある `original/*.pdf` を流用してダウンロードを省く |
 | `--prune-pdf` | 変換後にPDFを削除して容量を空ける（図の確認はできなくなる） |
 
-ビルド末尾で網羅性（3,873ページ / 1,914コマンド / 設定例54件）を自動チェックします。
+ビルド末尾で網羅性（3,949ページ / 1,914コマンド / 設定例56件）を自動チェックします。
 値がズレた場合は、取得漏れかサイト側の改版が疑われます。
 
 ### v1.0.0 からの移行
@@ -235,6 +236,7 @@ FITELnet および関連する製品名・会社名は、各権利者の商標�
 
 - マニュアル: <https://www.furukawaelectric.com/fitelnet/product/f310/manual/>
 - 設定例: <https://www.furukawaelectric.com/fitelnet/setting/>
+- コンテナ(LXC)ドキュメント: <https://www.furukawaelectric.com/fitelnet/product/container/lxc/>
 
 取得したデータの著作権は古河電気工業株式会社または各権利者に帰属します。生成された知識ベース以下の
 PDF・HTML・Markdown・索引データにも、同社または各権利者の著作物に由来する内容が含まれます。
