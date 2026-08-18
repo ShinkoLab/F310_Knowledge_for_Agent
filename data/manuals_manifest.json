@@ -1,6 +1,6 @@
 {
   "source": "https://www.furukawaelectric.com/fitelnet/product/f310/manual/",
-  "note": "FITELnet F310 純正マニュアルの取得先。本リポジトリはPDF本体を含まない。利用者が build.py で公式サイトから取得する。pages は取得物の健全性確認に使う想定ページ数。source を持つエントリは source の掲載ページから取得する（コンテナ(LXC)説明書など、F310マニュアルページ以外のもの）。",
+  "note": "FITELnet F310 純正マニュアルの取得先。本リポジトリはPDF本体を含まない。利用者が build.py で公式サイトから取得する。pages は取得物の健全性確認に使う想定ページ数。取得は url のみで行う。source は F310マニュアルページ以外から取ったもの（コンテナ(LXC)関連など）の掲載元を記録するためのフィールドで、取得処理では参照しない。",
   "manuals": [
     {
       "file": "goriyouF310.pdf",
