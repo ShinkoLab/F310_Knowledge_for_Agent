@@ -1,6 +1,6 @@
 ---
 name: lookup
-description: 古河電工 FITELnet F310 ルータの純正マニュアル（全16冊3,949ページ・全1,914コマンド）と公式設定例・コンテナ説明書78件を引くための知識ベース。F310 / FITELnet のコマンド構文や書式、config・コンフィグの作成、show系の運用コマンド、ログ・syslog・エラーメッセージの意味、ハード/ソフト仕様やMIB、IPoE（v6プラス・OCNバーチャルコネクト）・IPsec/VPN・冗長化(VRRP)・OSPF/BGP・QoS・ローカルブレイクアウト(LBO)の設定例、コンテナ（LXC / Alpine Linux / container コマンド）とその上で動くアプリ（NetFlow(softflowd)・Proxy(squid)・Remote Wireshark・ZTP用Pythonスクリプト）を調べるときに使う。
+description: 古河電工 FITELnet F310 ルータの純正マニュアルと公式設定例・コンテナ説明書を引くための知識ベース。F310 / FITELnet のコマンド構文や書式、config・コンフィグの作成、show系の運用コマンド、ログ・syslog・エラーメッセージの意味、ハード/ソフト仕様やMIB、IPoE（v6プラス・OCNバーチャルコネクト）・IPsec/VPN・冗長化(VRRP)・OSPF/BGP・QoS・ローカルブレイクアウト(LBO)の設定例、コンテナ（LXC / Alpine Linux）とNetFlow(softflowd)・Proxy(squid)・Remote Wireshark・ZTP を調べるときに使う。
 ---
 
 # FITELnet F310 知識ベース

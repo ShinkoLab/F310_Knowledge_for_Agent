@@ -73,6 +73,10 @@ python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版�
 
 抽出漏れは凡例（マニュアル冒頭のマーカー説明）2件のみで、これは意図的に除外している。
 
+この表の数値を `skills/lookup/SKILL.md` の `description` に書かないこと。自動起動の判定に効くのは
+固有名（`v6プラス`・`softflowd`・`squid` 等）であって数値ではなく、書くと内容を足すたびに
+description の更新が必要になる。規模を示すのは README と `manuals_index.md` の役割。
+
 ## command_index.json のスキーマ / パーサの前提
 
 1件 = `{command, manual, category, page, function（【機能】）, syntax（【入力形式】, no形式含む）, mode（【動作モード】）, ref}`。
