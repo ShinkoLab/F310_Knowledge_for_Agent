@@ -141,16 +141,20 @@ def cmd_cmd(args) -> int:
     for c in idx["commands"]:
         if args.manual and c["manual"] != manual_stem(args.manual):
             continue
-        if pat.search(c["command"]) or (args.desc and pat.search(c["function"])):
+        # 旧い索引には description が無いので .get。params は語が多すぎて当たりが散るため対象外
+        if pat.search(c["command"]) or (
+                args.desc and (pat.search(c["function"]) or pat.search(c.get("description", "")))):
             hits.append(c)
 
     if not hits:
-        print(f"該当なし: {args.pattern}（--desc で【機能】本文も対象にできます）")
+        print(f"該当なし: {args.pattern}（--desc で【機能】【説明】本文も対象にできます）")
         return 1
 
     shown = hits[: args.limit]
     for c in shown:
-        mode = f"[{c['mode']}]" if c["mode"] else ""
+        # モードは長いと折り返されて複数行になる。英字どうしの境目だけ空白に戻して1行にする
+        mode = re.sub(r"(?<=[\x21-\x7e])\n(?=[\x21-\x7e])", " ", c["mode"]).replace("\n", "")
+        mode = f"[{mode}]" if mode else ""
         print(f"\n{c['command']}  {mode}  — {c['ref']}")
         if args.full:
             if c["function"]:
@@ -158,6 +162,13 @@ def cmd_cmd(args) -> int:
             if c["syntax"]:
                 for ln in c["syntax"].splitlines():
                     print(f"  {ln}")
+            for label, key, n in (("説明", "description", 500), ("未設定時", "default", 300)):
+                if c.get(key):
+                    print(f"  【{label}】" + trim(c[key], n).replace("\n", "\n  "))
+            if c.get("params"):
+                print("  【パラメータ】")
+                for ln in c["params"].splitlines():
+                    print(f"    {ln}" if ln.strip() else "")
         else:
             first = c["syntax"].splitlines()[0] if c["syntax"] else ""
             if first:
@@ -301,8 +312,8 @@ def main() -> int:
 
     s = sub.add_parser("cmd", help="コマンド索引を引く")
     s.add_argument("pattern", help="コマンド名の正規表現（部分一致・大小無視）")
-    s.add_argument("--full", action="store_true", help="【機能】と入力形式を全文表示")
-    s.add_argument("--desc", action="store_true", help="【機能】本文も検索対象にする")
+    s.add_argument("--full", action="store_true", help="【機能】・入力形式・【説明】・【未設定時】・パラメータ表を表示")
+    s.add_argument("--desc", action="store_true", help="【機能】【説明】本文も検索対象にする（パラメータ表は対象外）")
     s.add_argument("--manual", help="cmd_refe_config / cmd_refe_ope に絞る")
     s.add_argument("--limit", type=int, default=20)
     s.set_defaults(func=cmd_cmd)
