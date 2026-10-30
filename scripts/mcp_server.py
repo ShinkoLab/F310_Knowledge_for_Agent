@@ -26,9 +26,9 @@ from mcp.server import MCPServer
 
 import lookup
 
-INSTRUCTIONS = """古河電工 FITELnet F310 ルータの純正マニュアル（全10冊3,873ページ・全1,914コマンド）
-と公式設定例（54件）を検索する。マニュアル＝コマンド書式の正典、設定例＝動く設定の実例集。
-用途で使い分けること。
+INSTRUCTIONS = """古河電工 FITELnet F310 ルータの純正マニュアル（コンテナ(LXC)関連の説明書を含む）と
+公式設定例・コンテナ説明書を検索する。収録の規模は f310_status が返す。
+マニュアル＝コマンド書式の正典、設定例＝動く設定の実例集。用途で使い分けること。
 
 どこを引くか:
 - 「実際に動く設定を組みたい」「この機能のconfig例は?」 → f310_ex（まず実例、必要ならマニュアルで裏を取る）
@@ -37,10 +37,22 @@ INSTRUCTIONS = """古河電工 FITELnet F310 ルータの純正マニュアル�
 - 「対応本数・性能値は?」「MIB/Trapは?」 → f310_grep(pattern, manuals=["siyou"])
 - 「この機能は何をする?」 → f310_grep(pattern, manuals=["kinou"])
 - 「動かない、切り分けたい」 → f310_grep(pattern, manuals=["trouble"])
+- 「コンテナ(LXC)の使い方は?」「コンテナでNetFlow/Proxyを動かしたい」
+  → f310_grep(pattern, manuals=["lxc_app_man","softflowd_man","squid_man"])、f310_ex("コンテナ")
+- 「コンテナのOSは旧OS/Alpineどっち?」「入っているOSSは?」
+  → f310_page("lxc_check_change", "1-2")、f310_grep(パッケージ名, manuals=["alpine_oss"])
 
 先に f310_status を呼び、知識ベースが構築済みか確認すること。未構築ならビルド手順が返る。
 回答には必ず出典（マニュアル名とページ番号、または設定例のURL）を添えること。
 推測でコマンドを作らない。索引に無い構文は「マニュアルに記載が見つからない」と答えること。
+
+注意:
+- 設定例の多くは F70/F220系との共通ページ。各ファイルの「対象装置」欄にF310が含まれることを確認してから提示する。
+- コンテナの説明書（lxc_app_man / softflowd_man / squid_man と container_*.md）も複数機種共通の資料。
+  設定例中のホスト名やインタフェース番号が他機種のものになっていることがあるので、F310の構成に読み替えて提示する。
+  container backup / restore / image 等は説明書側に記載が無く、正典はコマンドリファレンス（f310_cmd("^container")）。
+- 同名コマンドは動作モード違いで複数ある。どのモードのものかを明示する。
+- LBOには新（app-profile）旧（lbo-profile）2つのコマンド体系がある。どちらかを明示する。
 """
 
 mcp = MCPServer("f310-kb", instructions=INSTRUCTIONS)
@@ -106,9 +118,10 @@ def f310_grep(
     limit: int = 40,
 ) -> str:
     """マニュアル本文を正規表現で全文検索し、出典ページ付きで返す（例: "message.pdf p.414: …"）。
-    manuals 省略時は全10冊が対象。用途別の絞り込み:
+    manuals 省略時は全マニュアル（コンテナ関連を含む）が対象。用途別の絞り込み:
     ログ/エラーの意味 → manuals=["message"]。対応本数・性能値・MIB/Trap → ["siyou"]。
     機能説明 → ["kinou"]。障害切り分け → ["trouble"]。
+    コンテナ(LXC) → ["lxc_app_man","softflowd_man","squid_man"]、OS/OSS → ["lxc_check_change","alpine_oss"]。
     前後の文脈が必要なときは f310_page で該当ページを読む。"""
     ns = types.SimpleNamespace(
         pattern=pattern, manuals=manuals or [], case=case, limit=limit
@@ -129,6 +142,7 @@ def f310_ex(keyword: str, limit: int = 15) -> str:
     """公式設定例をキーワードで検索する（索引の行・本文の両方が対象）。
     「実際に動く設定を組みたい」「この機能のconfig例は?」にまず使う（マニュアルより先に引く）。
     設定例の多くは F70/F220系との共通ページなので、対象装置にF310が含まれることを確認してから提示すること。
+    コンテナ説明書（container_*.md）も対象で、複数機種共通の資料なのでF310向けに読み替えること。
     LBOには新（app-profile）/旧（lbo-profile）2つのコマンド体系があるので、どちらかを明示すること。"""
     ns = types.SimpleNamespace(keyword=keyword, limit=limit)
     return _run(lookup.cmd_ex, ns)
