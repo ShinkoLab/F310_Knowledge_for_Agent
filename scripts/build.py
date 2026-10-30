@@ -93,7 +93,7 @@ def main() -> int:
     root = kb.kb_root()
     print(f"KB: {root}\n")
 
-    # 旧パスに構築済みKBが残っているなら、38MBを取り直す前に移行を促して止める。
+    # 旧パスに構築済みKBが残っているなら、約48MBを取り直す前に移行を促して止める。
     # dry-run はURLを見るだけでKBに触らないので対象外。
     hint = kb.legacy_hint()
     if hint and not args.dry_run:

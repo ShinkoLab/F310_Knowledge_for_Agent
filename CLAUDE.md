@@ -79,7 +79,7 @@ description の更新が必要になる。規模を示すのは README と `manu
 
 ## command_index.json のスキーマ / パーサの前提
 
-1件 = `{command, manual, category, page, function（【機能】）, syntax（【入力形式】, no形式含む）, mode（【動作モード】）, ref}`。
+1件 = `{command, manual, category, page, function（【機能】）, syntax（【入力形式】, no形式含む）, mode（【動作モード】）, params（パラメータ表）, description（【説明】）, default（【未設定時】）, ref}`。
 
 `scripts/build_command_index.py` は本文の `【機能】` ブロックを起点に、直前行をコマンド名として抽出する。
 純正PDFのレイアウト揺れに個別対応済み:
@@ -90,6 +90,15 @@ description の更新が必要になる。規模を示すのは README と `manu
 - ページ跨ぎで名前が前ページに残る場合、`【入力形式】` の先頭語から補完
 
 `set mtu`・`description` 等の**同名複数エントリは正常**（動作モード違いで別ページに存在するため各々保持）。
+
+`mode` / `params` / `description` / `default` はPDFのテキスト抽出順が崩れている前提で読む（`function`・`syntax` は従来どおり）:
+
+- **mode は最初の段落だけ**。【動作モード】の直後に表の見出し（パラメータ/設定内容…）や次ページのヘッダが
+  続けて出るため、空行かページ区切りで打ち切る。複数モードの折り返し（空行なしの複数行）は正常。
+- **パラメータ表は元の位置にいない**。「パラメータ／設定内容」で始まる表を本文から切り出し、
+  約4割は後ろのコマンドのブロックやページ末尾に回っている。持ち主は【パラメータ】見出しの待ち行列と、
+  表の先頭セルが構文に含まれるかで決める（`assign_tables()`）。割当は推定で、約3%は構文で裏が取れない。
+- `description` / `default` はページヘッダと次コマンドの節番号・名前を落としたもの。
 
 ## 設定例パイプラインの前提
 

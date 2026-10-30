@@ -2,7 +2,7 @@
 """FITELnet F310 コマンドリファレンス(md)から、コマンド索引 JSON を生成する。
 
 各コマンド定義ブロック（コマンド名 → 【機能】→【入力形式】→【動作モード】…）を解析し、
-  command / manual / page / function / syntax / mode / ref
+  command / manual / page / function / syntax / mode / params / description / default / ref
 を持つ JSON を出力する。AI がコマンド構文をピンポイント参照するための索引。
 
 純正PDFのレイアウト揺れへの個別対応（版数見出しの読み飛ばし、節番号・モード括弧の除去、
@@ -29,6 +29,9 @@ JP_RE = re.compile(r"[ぁ-んァ-ヶ一-龠、。：]")
 SECNO_RE = re.compile(r"^\d+(?:\.\d+)+\s+")      # 先頭の節番号 例: "10.10.1 "
 MODEPAREN_RE = re.compile(r"\s*[（(][^）)]*モード[^）)]*[）)]\s*$")  # 末尾の(〜モード)
 VERSION_RE = re.compile(r"^V?\d+(?:\.\d+)+$")    # 版数/節番号のみの行 例: V01.00 / 6.1.54
+SECNO_ONLY_RE = re.compile(r"^\d+(?:\.\d+)+$")   # 節番号のみの行 例: 10.7.1
+CHAPTER_RE = re.compile(r"^第\d+ 章")             # ページヘッダの章見出し 例: 第10 章 IPv4 の設定
+PARAM_HEAD = ("パラメータ", "パラメーター")        # パラメータ表の先頭行（次の非空行が「設定内容」）
 
 
 def normalize_name(s: str) -> str:
@@ -75,7 +78,12 @@ def name_from_syntax(syntax: str) -> str:
 
 
 def find_command_name(lines, func_idx):
-    """【機能】(func_idx) から上方向に走査してコマンド名を返す。無ければ None。
+    """【機能】(func_idx) から上方向に走査してコマンド名を返す。無ければ None。"""
+    return find_command_name_at(lines, func_idx)[0]
+
+
+def find_command_name_at(lines, func_idx):
+    """find_command_name の本体。(名前, 名前行の位置) を返す。見つからなければ (None, None)。
     版数ブロック(【対応ファームウェアバージョン】とその値)や節番号行は読み飛ばし、
     別の見出し(前コマンドの終端)に達したら打ち切る。"""
     j = func_idx - 1
@@ -91,14 +99,161 @@ def find_command_name(lines, func_idx):
             if "ファーム" in m.group(1):       # 版数見出し(対応/対象の誤記含む) → 飛ばす
                 j -= 1
                 continue
-            return None                        # 別見出し = 前コマンド領域 → 打ち切り
+            return None, None                  # 別見出し = 前コマンド領域 → 打ち切り
         name = normalize_name(s)
         if is_command_name(name):
-            return name
+            return name, j
         # 版数値・節番号・説明断片 → さらに上へ
         j -= 1
         steps += 1
-    return None
+    return None, None
+
+
+def next_nonblank(lines, i):
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    return i
+
+
+def strip_page_debris(lines):
+    """ページ区切り直後のヘッダ（ページ番号・「コマンドリファレンス - …」・章見出し・節見出し）を落とす。
+    区切り行（===== PAGE n =====）自体は残す。表やセクションの終端判定に使うため。"""
+    out, i, n = [], 0, len(lines)
+    while i < n:
+        out.append(lines[i])
+        m = PAGE_RE.match(lines[i])
+        i += 1
+        if not m:
+            continue
+        j = next_nonblank(lines, i)
+        if j >= n or lines[j].strip() != m.group(1):
+            continue
+        j = next_nonblank(lines, j + 1)
+        if j >= n or not lines[j].strip().startswith("コマンドリファレンス"):
+            continue
+        j = next_nonblank(lines, j + 1)
+        if j < n and CHAPTER_RE.match(lines[j].strip()):
+            j = next_nonblank(lines, j + 1)          # 章の下の節見出し（無いこともある）
+            if j < n and not MARK_RE.match(lines[j].strip()):
+                j += 1
+        i = j
+    return out
+
+
+def next_header_start(lines, func_idx):
+    """次のコマンドの見出し群（節番号・コマンド名）が始まる行を返す。
+    ブロックは次の【機能】までなので、末尾に次コマンドの "10.7.1 / ip address" が混ざる。
+    それを説明や表に取り込まないための切り落とし位置。名前が取れなければ func_idx。"""
+    name, j = find_command_name_at(lines, func_idx)
+    if name is None:
+        return func_idx
+    cut, seen, k = j, 0, j - 1
+    while k >= 0 and seen < 6:
+        s = lines[k].strip()
+        if MARK_RE.match(s) or PAGE_RE.match(lines[k]):
+            break
+        if s:
+            seen += 1
+            if SECNO_ONLY_RE.match(s) or CHAPTER_RE.match(s):
+                cut = k
+        k -= 1
+    return cut
+
+
+def find_param_tables(lines):
+    """パラメータ表（「パラメータ」「設定内容」…で始まる表）の範囲 [(start, end), ...] を返す。
+    表は次の【見出し】・ページ区切り・次の表の先頭までで、別コマンドの表が連続することがある。"""
+    def is_head(i):
+        if lines[i].strip() not in PARAM_HEAD:
+            return False
+        j = next_nonblank(lines, i + 1)
+        return j < len(lines) and lines[j].strip() == "設定内容"
+
+    out, i, n = [], 0, len(lines)
+    while i < n:
+        if is_head(i):
+            e = i + 1
+            while (e < n and not PAGE_RE.match(lines[e]) and not MARK_RE.match(lines[e].strip())
+                   and not is_head(e)):
+                e += 1
+            out.append((i, e))
+            i = e
+        else:
+            i += 1
+    return out
+
+
+def table_first_cell(table: str) -> str:
+    """表の先頭データ行の1セル目（パラメータ名）。見出し行の4語は読み飛ばす。"""
+    for ln in table.splitlines():
+        s = ln.strip()
+        if s and s not in PARAM_HEAD and s not in ("設定内容", "設定範囲", "省略時"):
+            return s
+    return ""
+
+
+def squash(s: str) -> str:
+    return re.sub(r"[\s<>\[\]{}()|（）,]", "", s)
+
+
+def first_paragraph(lines) -> str:
+    """最初の段落（空行かページ区切りまで）。複数モードの折り返しは同じ段落に入る。"""
+    out = []
+    for ln in lines:
+        s = ln.strip()
+        if PAGE_RE.match(ln) or (not s and out):
+            break
+        if s:
+            out.append(s)
+    return "\n".join(out)
+
+
+def section_text(lines, keep_blank=False) -> str:
+    body = [ln.rstrip() for ln in lines if not PAGE_RE.match(ln)]
+    text = "\n".join(body).strip()
+    return re.sub(r"\n{2,}", "\n\n" if keep_blank else "\n", text)
+
+
+def split_raw(lines) -> dict:
+    """【見出し】→ 本文の行リスト。extract_sections と違い空行を保つ（段落判定のため）。"""
+    out, key = {}, None
+    for ln in lines:
+        m = MARK_RE.match(ln.strip())
+        if m:
+            key = m.group(1)
+            out[key] = []
+        elif key is not None:
+            out[key].append(ln)
+    return out
+
+
+def assign_tables(recs) -> None:
+    """パラメータ表を持ち主のコマンドに割り当て、recs[i]["params"] に入れる。
+
+    PDFのテキスト抽出では表が自分のブロックに収まらず、後ろのコマンドの【入力形式】の後ろや
+    ページ末尾に回ることがある（約4割）。【パラメータ】見出しは持ち主側に残るので、
+    「見出しがあって表がまだ無いコマンド」の待ち行列と、表の先頭セル（パラメータ名）が
+    構文に含まれるかで持ち主を決める。決め手が無ければ待ち行列の先頭、それも無ければ現在のブロック。"""
+    pend = []
+    for k, r in enumerate(recs):
+        if r["named"] and r["heading"]:
+            pend.append(k)
+        for page, text in r["tables"]:
+            pend = [p for p in pend if page - recs[p]["page"] <= 2]
+            # 見出しの無いコマンド（enable 等）の表も後ろへ回ることがあるので、直近の見出し無しも候補に足す
+            bare = [j for j in range(max(0, k - 6), k + 1)
+                    if recs[j]["named"] and not recs[j]["heading"] and not recs[j]["params"]
+                    and page - recs[j]["page"] <= 2]
+            cands = pend + bare + ([k] if k not in pend + bare and r["named"] else [])
+            first = squash(table_first_cell(text))
+            pick = next((c for c in cands if first and first in recs[c]["syn"]), None)
+            if pick is None:
+                pick = pend[0] if pend else (k if r["named"] else None)
+            if pick is None:
+                continue
+            recs[pick]["params"].append(text)
+            if pick in pend:
+                pend.remove(pick)
 
 
 def parse(stem: str, label: str) -> list[dict]:
@@ -117,7 +272,7 @@ def parse(stem: str, label: str) -> list[dict]:
     marks = [i for i, ln in enumerate(lines) if ln.strip() == "【機能】"]
 
     # 2) 各ブロック（【機能】→ 次の【機能】の手前）でセクション抽出＋名前決定
-    entries = []
+    recs = []
     for k, func_marker in enumerate(marks):
         end = marks[k + 1] if k + 1 < len(marks) else len(lines)
         block = lines[func_marker:end]
@@ -127,19 +282,49 @@ def parse(stem: str, label: str) -> list[dict]:
         name = find_command_name(lines, func_marker)
         if not name:
             name = name_from_syntax(sections.get("入力形式", ""))
-        if not name:
-            continue  # 凡例など非コマンド
 
-        entries.append({
-            "command": name,
-            "manual": stem,
-            "category": label,
+        # 動作モード・説明・未設定時・パラメータ表は、ページヘッダと次コマンドの見出しを落とし、
+        # 表を本文から切り出した上で読む（表の見出しが【動作モード】の本文に流れ込むため）。
+        if k + 1 < len(marks):
+            block = block[:max(1, next_header_start(lines, marks[k + 1]) - func_marker)]
+        block = strip_page_debris(block)
+        ranges = find_param_tables(block)
+        cut = {i for s, e in ranges for i in range(s, e)}
+        rest = split_raw([ln for i, ln in enumerate(block) if i not in cut])
+        tables = []
+        for s, e in ranges:
+            text = section_text(block[s:e], keep_blank=True)
+            if len(text.splitlines()) > 4:               # 見出し4語だけの表は中身なし
+                tables.append((page_at[func_marker + s], text))
+
+        recs.append({
+            "named": bool(name),
+            "heading": any(ln.strip() == "【パラメータ】" for ln in block),
+            "syn": squash(sections.get("入力形式", "")),
             "page": page_at[func_marker],
-            "function": sections.get("機能", ""),
-            "syntax": sections.get("入力形式", ""),
-            "mode": sections.get("動作モード", ""),
-            "ref": f"{stem}.pdf p.{page_at[func_marker]}",
+            "tables": tables,
+            "params": [],
+            "entry": {
+                "command": name,
+                "manual": stem,
+                "category": label,
+                "page": page_at[func_marker],
+                "function": sections.get("機能", ""),
+                "syntax": sections.get("入力形式", ""),
+                "mode": first_paragraph(rest.get("動作モード", [])),
+                "params": "",
+                "description": section_text(rest.get("説明", [])),
+                "default": section_text(rest.get("未設定時", [])),
+                "ref": f"{stem}.pdf p.{page_at[func_marker]}",
+            },
         })
+
+    assign_tables(recs)
+    entries = []
+    for r in recs:
+        if r["named"]:                                   # 凡例など非コマンドは捨てる
+            r["entry"]["params"] = "\n\n".join(r["params"])
+            entries.append(r["entry"])
     return entries
 
 

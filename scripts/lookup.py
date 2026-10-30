@@ -15,6 +15,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 
 import kb_paths as kb
 
@@ -54,6 +55,55 @@ def trim(s: str, n: int = 200) -> str:
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
+# 英数字 ⇔ 日本語の境目に空白を許容する。PDFのテキスト層は「v6 プラス」のように
+# 境目へ空白を挟むため、利用者が「v6プラス」と書くと当たらない（逆も同様）。
+# 全角英数字は半角と同一視する（1字ずつ NFKC で半角化し、元の字との文字クラスにする）。
+_META = set("\\.^$*+?{}[]|()")
+_JA = "\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f"  # かな・漢字・半角カナ
+_JA_RE = re.compile("[" + _JA + "]")
+
+
+def _is_ascii_alnum(ch: str) -> bool:
+    return ch.isascii() and ch.isalnum()
+
+
+def fuzzy_pattern(text: str) -> str:
+    """利用者の入力を、境目の空白ゆれを許す正規表現文字列にして返す。
+
+    正規表現メタ文字を含む入力は利用者が構文を書いたものとして一切変換しない
+    （`\\s*` を足すと意味が変わりうるため、安全に変換できる素の語句に限定）。
+    """
+    if any(c in _META for c in text):
+        return text
+    # 前後の空白は利用者が意図して付けたもの（例: "no "）なので触らない
+    body = text.strip()
+    if not body:
+        return re.escape(text)
+    lead, trail = text[: len(text) - len(text.lstrip())], text[len(text.rstrip()):]
+    out = [re.escape(lead)]
+    prev = ""  # 直前の非空白文字の種別: "a"(英数) / "j"(日本語) / ""
+    gap = False  # 直前に空白があった
+    for ch in body:
+        if ch.isspace():
+            gap = True
+            continue
+        n = unicodedata.normalize("NFKC", ch)
+        kind = "a" if len(n) == 1 and _is_ascii_alnum(n) else ("j" if _JA_RE.match(ch) else "")
+        if prev and gap:
+            # 元々空白があった箇所。英数⇔日本語の境目なら空白なしも許す、
+            # それ以外（英語の語間など）は元の空白を保つ。
+            out.append("\\s*" if {prev, kind} == {"a", "j"} else r"\s+")
+        elif {prev, kind} == {"a", "j"}:
+            out.append("\\s*")
+        if kind == "a":
+            out.append("[" + re.escape(n) + re.escape(ch) + "]" if n != ch else re.escape(n))
+        else:
+            out.append(re.escape(ch))
+        prev, gap = kind, False
+    out.append(re.escape(trail))
+    return "".join(out)
+
+
 # ---------------------------------------------------------------- status
 def cmd_status(args) -> int:
     root = kb.kb_root()
@@ -82,7 +132,7 @@ def cmd_cmd(args) -> int:
     require_kb()
     idx = load_index()
     try:
-        pat = re.compile(args.pattern, re.I)
+        pat = re.compile(fuzzy_pattern(args.pattern), re.I)
     except re.error as e:
         print(f"正規表現エラー: {e}", file=sys.stderr)
         return 1
@@ -91,16 +141,20 @@ def cmd_cmd(args) -> int:
     for c in idx["commands"]:
         if args.manual and c["manual"] != manual_stem(args.manual):
             continue
-        if pat.search(c["command"]) or (args.desc and pat.search(c["function"])):
+        # 旧い索引には description が無いので .get。params は語が多すぎて当たりが散るため対象外
+        if pat.search(c["command"]) or (
+                args.desc and (pat.search(c["function"]) or pat.search(c.get("description", "")))):
             hits.append(c)
 
     if not hits:
-        print(f"該当なし: {args.pattern}（--desc で【機能】本文も対象にできます）")
+        print(f"該当なし: {args.pattern}（--desc で【機能】【説明】本文も対象にできます）")
         return 1
 
     shown = hits[: args.limit]
     for c in shown:
-        mode = f"[{c['mode']}]" if c["mode"] else ""
+        # モードは長いと折り返されて複数行になる。英字どうしの境目だけ空白に戻して1行にする
+        mode = re.sub(r"(?<=[\x21-\x7e])\n(?=[\x21-\x7e])", " ", c["mode"]).replace("\n", "")
+        mode = f"[{mode}]" if mode else ""
         print(f"\n{c['command']}  {mode}  — {c['ref']}")
         if args.full:
             if c["function"]:
@@ -108,6 +162,13 @@ def cmd_cmd(args) -> int:
             if c["syntax"]:
                 for ln in c["syntax"].splitlines():
                     print(f"  {ln}")
+            for label, key, n in (("説明", "description", 500), ("未設定時", "default", 300)):
+                if c.get(key):
+                    print(f"  【{label}】" + trim(c[key], n).replace("\n", "\n  "))
+            if c.get("params"):
+                print("  【パラメータ】")
+                for ln in c["params"].splitlines():
+                    print(f"    {ln}" if ln.strip() else "")
         else:
             first = c["syntax"].splitlines()[0] if c["syntax"] else ""
             if first:
@@ -124,7 +185,7 @@ PAGE_RE = re.compile(r"^===== PAGE (\d+) =====$")
 def cmd_grep(args) -> int:
     require_kb()
     try:
-        pat = re.compile(args.pattern, 0 if args.case else re.I)
+        pat = re.compile(fuzzy_pattern(args.pattern), 0 if args.case else re.I)
     except re.error as e:
         print(f"正規表現エラー: {e}", file=sys.stderr)
         return 1
@@ -198,7 +259,7 @@ def cmd_ex(args) -> int:
         print("設定例が未生成です。build.py を実行してください。", file=sys.stderr)
         return 2
     try:
-        pat = re.compile(args.keyword, re.I)
+        pat = re.compile(fuzzy_pattern(args.keyword), re.I)
     except re.error as e:
         print(f"正規表現エラー: {e}", file=sys.stderr)
         return 1
@@ -251,8 +312,8 @@ def main() -> int:
 
     s = sub.add_parser("cmd", help="コマンド索引を引く")
     s.add_argument("pattern", help="コマンド名の正規表現（部分一致・大小無視）")
-    s.add_argument("--full", action="store_true", help="【機能】と入力形式を全文表示")
-    s.add_argument("--desc", action="store_true", help="【機能】本文も検索対象にする")
+    s.add_argument("--full", action="store_true", help="【機能】・入力形式・【説明】・【未設定時】・パラメータ表を表示")
+    s.add_argument("--desc", action="store_true", help="【機能】【説明】本文も検索対象にする（パラメータ表は対象外）")
     s.add_argument("--manual", help="cmd_refe_config / cmd_refe_ope に絞る")
     s.add_argument("--limit", type=int, default=20)
     s.set_defaults(func=cmd_cmd)
