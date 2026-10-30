@@ -101,7 +101,8 @@ def f310_cmd(
 ) -> str:
     """F310のコマンド索引を正規表現で引く（部分一致・大小無視）。書式・入力形式・出典ページの正典。
     「このコマンドの書式は?」「パラメータの意味は?」に使う。
-    full=True で【機能】説明と全入力形式を表示。desc=True で【機能】本文も検索対象にする。
+    full=True で【機能】・全入力形式・【説明】・【未設定時】・パラメータ表を表示。desc=True で【機能】【説明】本文も検索対象にする。
+    パラメータ表の持ち主は推定で割り当てているので、値そのものを回答に使うときは f310_page で出典ページを確かめること。
     manual は cmd_refe_config（構成定義編）/ cmd_refe_ope（運用管理編）のどちらかに絞れる。
     同名コマンドが複数出ることがある（動作モード違いで別ページに存在するため、いずれも正常）。"""
     ns = types.SimpleNamespace(
@@ -122,6 +123,7 @@ def f310_grep(
     ログ/エラーの意味 → manuals=["message"]。対応本数・性能値・MIB/Trap → ["siyou"]。
     機能説明 → ["kinou"]。障害切り分け → ["trouble"]。
     コンテナ(LXC) → ["lxc_app_man","softflowd_man","squid_man"]、OS/OSS → ["lxc_check_change","alpine_oss"]。
+    正規表現の記号を含まない語は、英数字と日本語の境目の空白ゆれ（v6プラス / v6 プラス）と全角英数字を吸収する。
     前後の文脈が必要なときは f310_page で該当ページを読む。"""
     ns = types.SimpleNamespace(
         pattern=pattern, manuals=manuals or [], case=case, limit=limit
