@@ -1,0 +1,146 @@
+{
+  "note": "パーサを検証した時点の公式サイトの版（本文は含まない）。build.py --accept-current で手元のKBの現状から書き直す。手で編集しない。",
+  "manuals": {
+    "goriyouF310.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 00:48:00 GMT",
+      "bytes": 4414674,
+      "pages": 58
+    },
+    "kinou.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 04:07:00 GMT",
+      "bytes": 5221107,
+      "pages": 115
+    },
+    "cmd_refe_config.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 00:28:00 GMT",
+      "bytes": 6205794,
+      "pages": 1166,
+      "commands": 1332
+    },
+    "cmd_refe_ope.pdf": {
+      "last_modified": "Fri, 02 Oct 2026 02:31:00 GMT",
+      "bytes": 4204259,
+      "pages": 801,
+      "commands": 632
+    },
+    "message.pdf": {
+      "last_modified": "Fri, 02 Oct 2026 04:11:00 GMT",
+      "bytes": 6354583,
+      "pages": 1627
+    },
+    "siyou.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 00:48:00 GMT",
+      "bytes": 2720724,
+      "pages": 77
+    },
+    "trouble.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 00:48:00 GMT",
+      "bytes": 1542590,
+      "pages": 23
+    },
+    "oss_list.pdf": {
+      "last_modified": "Thu, 01 Oct 2026 00:48:00 GMT",
+      "bytes": 185254,
+      "pages": 13
+    },
+    "rackmountRMKB010211wb.pdf": {
+      "last_modified": "Tue, 23 Apr 2024 21:48:09 GMT",
+      "bytes": 5921683,
+      "pages": 44
+    },
+    "usbband.pdf": {
+      "last_modified": "Tue, 23 Apr 2024 21:48:50 GMT",
+      "bytes": 2272256,
+      "pages": 21
+    },
+    "lxc_app_man.pdf": {
+      "last_modified": "Fri, 08 Aug 2025 08:49:27 GMT",
+      "bytes": 5599334,
+      "pages": 57
+    },
+    "softflowd_man.pdf": {
+      "last_modified": "Fri, 26 Feb 2021 04:23:59 GMT",
+      "bytes": 400261,
+      "pages": 6
+    },
+    "squid_man.pdf": {
+      "last_modified": "Mon, 19 Jul 2021 12:35:42 GMT",
+      "bytes": 530992,
+      "pages": 8
+    },
+    "lxc_check_change.pdf": {
+      "last_modified": "Fri, 02 Sep 2022 11:35:46 GMT",
+      "bytes": 196014,
+      "pages": 2
+    },
+    "lxc_check.pdf": {
+      "last_modified": "Mon, 01 Nov 2021 21:34:15 GMT",
+      "bytes": 168889,
+      "pages": 1
+    },
+    "alpine_oss.pdf": {
+      "last_modified": "Wed, 28 Aug 2024 06:27:58 GMT",
+      "bytes": 178775,
+      "pages": 2
+    }
+  },
+  "examples": {
+    "product__container__lxc__man__remote-wireshark.html": "23e84860ed10536ca47a7ae414289931ef8d9f21f29ea4f445c5c65418205d20",
+    "product__container__lxc__man__ztp-script.html": "ca074c0af60a3a5746f9c1c24fe42c70f57d0617277044579c868ad87b58eb34",
+    "product__f310__setting__detail__dhcp-server.html": "3daebc0913764aac6da9951c0de8f63670491a2fe97a31ad8f5e93c4ac83022e",
+    "product__f310__setting__detail__filter.html": "15d9986a8995a7206db8e987558e721ff0fd9b0ba7d524f81ea9e8cf132744f3",
+    "product__f310__setting__detail__natplus.html": "146a24cace0fc3b22d3513c8a4889c17679e8cc09b68d7796528f45fa65b4a6e",
+    "product__f310__setting__detail__pppoe-01.html": "3ef4c14b43dcc38297b00aecfcb67a91e36e1ff50cb73c6a287b3f7a0f7344c1",
+    "product__f310__setting__detail__pppoe-02.html": "eef9d4601ecf45e2335f9ccaab0b253062b80047491078166ca9bfaa124ededa",
+    "product__f310__setting__detail__sealed.html": "ac256c4615f7262f5618063388525789411a853abd8ada6a14c41c9c040ce849",
+    "product__f310__setting__detail__wan-manual.html": "57c38a27fc69c159eb66e665519e47332fc027f78585725d7ca9503573f5876d",
+    "setting__cloud-connect__OCI-list.html": "4ecb832a9e28b9182ab68ade290e71bf0be80d2c7fe4661f28996a8abc977722",
+    "setting__cloud-connect__amazon_vpc.html": "50de96ae30121e3c0a56d0827d0bf4c8f97991418790499596a37180dd7def9d",
+    "setting__cloud-connect__azure_vpn.html": "5b8035948f052c0a6f873cc3b6553d38060438dc15d8f11354fee2d1e82682a3",
+    "setting__interface__f70_CBQ.html": "47b2be915ecf5f616b1aed9cda1abc5e508884fe846609c14ca2ac813272e69b",
+    "setting__interface__f70_priq.html": "f3271ac8f83246fafae3c346e82f72fd744811580f3c94d8bd1d489dcb97a4c8",
+    "setting__interface__usb_ethernet-01.html": "d4b40eda267d1e676b14acd0854db9c4b47dda5755a3ae00959436cee9b7ea3e",
+    "setting__interface__usb_modem-01.html": "c7af4d13dc32cbc55267298cd5d2a7ec2bc2f09041274c0289669969f944b428",
+    "setting__ipoe__arteria_xpass.html": "7c7ee1b439765d6aba39e89efa97fac80c61ae037a97fb4364d81af8c8ea7ba3",
+    "setting__ipoe__biglobe_ipv6.html": "b915a292da47916fd1bd6623d88154615fb1638b60733ea00b4016f02481c1a3",
+    "setting__ipoe__hb46pp.html": "9bbb960b9adef202e7a3884d36418bced786fe9f88a8632d0a82c6df08acea6c",
+    "setting__ipoe__ipv6option.html": "89bad53b8eb897be5fbaec8eccb1561a556c44b9aae167dee92668f1b21f0c6e",
+    "setting__ipoe__mape_lbo.html": "4e1506bb8d3404d05fc19cfdc9b665e4798b799a7a99fbb4db858f38bb7b464a",
+    "setting__ipoe__ocn_vc.html": "8febddc3cdbe3284f3a7fe543dfb8728a577c326b9df378a026c889e46efc8f7",
+    "setting__ipoe__ocx_ipip.html": "9acdd4c9a91aaa6a465f1ade3bfc1c06aa1c311703d2ab6230696ea15a863909",
+    "setting__ipoe__static_l2tp.html": "76b298c7b8a5ead0874db4540cf388dc8172c1769cac9437d58113a72b315da8",
+    "setting__ipoe__static_lbo.html": "4479b79de5a33a162ec24c562f798f854a62f3028a44c95f000a14853a453c1a",
+    "setting__ipoe__v6plus_fixedip.html": "5fc7193d6302472a7dfd9f0aa133189f88918091ede440f690c76fc49443ac6d",
+    "setting__ipoe__v6plus_mape.html": "4d50775b3ad2af4b42f80e90f32139c6dec8eb5023f4977385e8c8677e860507",
+    "setting__ipsec__ikev2_vpn-remote.html": "0cae6a8f8a4f509f5c7e76ceb865029c6c47a51f992b019931b52350b675774c",
+    "setting__ipsec__ipsec-01.html": "50b565036b61a4b525cee2918cb6575d49a70eaec8b249a4d9efe5cc37c15a1d",
+    "setting__ipsec__ipsec-02.html": "189cbf09f4e16df29265abcaa4984c5f6e62e324bc5fd2a8c1dac53139683497",
+    "setting__ipsec__ipsec-mcast.html": "11d412e68b89f75b550e458b5004916837c26f5f7aec783cca2011fd467dd0f9",
+    "setting__ipsec__ipsec-rsa.html": "61d7efe70c473df3937130e27b5d67e07b3c3260fbb8a83517c401a88770475a",
+    "setting__ipsec__ipsec_ikev2_1.html": "2f9e9ba16e30d1010780a4e64c034cf15dedfd82391325deed73e808aac585aa",
+    "setting__ipsec__ipsec_ikev2_2.html": "8ab23a7aaaf86cfeda6b8ff8625248b0eab4a56d99fd89cb1d142e4dfda96cbf",
+    "setting__ipsec__l2tp-ipsec_remote.html": "d163bc9df42f23696fce32af7a030fb2d9699d5a479bcb2b4ea661470238739f",
+    "setting__ipsec__mpsa-list.html": "f55de262ef30f73776be7c148b14a509cf7bbb0b1de0cb09ed5e69fd338fd50f",
+    "setting__ipsec__nat-traversal.html": "6f2ad6c7513e44b4056755aceb80af271251325a57e3441cf5a46f0f4b1800bc",
+    "setting__ipsec__rsa_manual.html": "3353e0a03be7c0498420675312f0e5c0a09c1c07b76881d9e88d383bdec19dc8",
+    "setting__ipsec__vpnnat1.html": "371de0721ca0f6294eab6eb791b75d5464776794452ecaf30a3d0413716ee94a",
+    "setting__lbo__index.html": "94a66678c1c8e6c56193ee98c2d686845679826baff6a0439f2484390ac0381c",
+    "setting__other__auth-01.html": "19b25689133c356ae132e7263f071a12e4727db0f805d4f9a64a443a66299e4b",
+    "setting__other__auth-02.html": "d5c86528bd258d0a294c0fc7b99246e48f07a594a6fb87e3d9b62f3833732d8d",
+    "setting__other__auth-03.html": "c773a83e8248ef664fbb28a11c68e80f295dbf3a62eb6a23e792e6480b0db5d8",
+    "setting__other__f2500_ntp.html": "8b5f1665949036192a41f3a971527edb24ce87ee1380e3b49f5de124b4637a11",
+    "setting__other__f2500_resolver.html": "d6e3ec2328861afcab34c5d908c89b9c8f09b53015371b651db874ea9f01fce0",
+    "setting__other__mib.html": "9e2cf73588c86cce8f2ea1304d280f67882796bc7da49fc3f0f1c248043a5e21",
+    "setting__other__proxydns.html": "f57f590d55dca7143243f6443b0901b4ca3fcad7d86a5ab2928fbba8e2dc1258",
+    "setting__other__snmp-01.html": "2e4038763ae7e9954216e738b9631e738eca00c4af92865a9cf45de644a57c64",
+    "setting__other__sntp.html": "27c2ebab6a977183b0bc4e4180c870ec91c33451215c44a0ec3557650216d793",
+    "setting__other__ssh.html": "5a5108f1148c333b3e23c274794d81ba057c5f558c55c305a14400a0e71a75a0",
+    "setting__other__syslog.html": "6b619099e0b85c648441e0d2ece38af3bb985c4293cc91c2949ea1c2d873bff9",
+    "setting__redundancy__redundancy-01.html": "e782e0c92d8059e470c1f53837e13ba6dbcf60494514e8ce759f4c352854bba1",
+    "setting__routing__ebgp.html": "dc0299a470491543a6cac51379f20c42ab14477df6b30bdda83f095f72e66965",
+    "setting__routing__ospf.html": "78a5b89c0fae11f4dc5cbdedb857b1dad6a76a73f65e23e60b46c19eee84d864",
+    "setting__routing__ripv2.html": "e3b9d31fdec2b1e99fa7fc5cae69f85f27d2a2c9b6475412c22a5d7489d1719a",
+    "setting__routing__static-v4.html": "eedec984ef4ef735588e4548113f4ea23f1fffae23bc859c8d1fa809091e7fc4"
+  },
+  "example_count": 56
+}
