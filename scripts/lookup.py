@@ -127,7 +127,7 @@ def cmd_status(args) -> int:
     if not kb.original_dir().exists() or not any(kb.original_dir().glob("*.pdf")):
         print("  ※ PDF原本は保持していません（図の確認が必要なら再取得が要ります）")
     # ネットワークを使わない鮮度の判定。古くても検索はできるので、案内だけして 0 を返す
-    notes = validated.local_status(validated.load())
+    notes = validated.local_status(validated.load(), idx)
     stale = validated.contact_note(state)
     if notes or stale:
         print("  更新の案内:")

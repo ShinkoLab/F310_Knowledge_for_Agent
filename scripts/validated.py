@@ -115,22 +115,24 @@ def _http_date(s: str):
         return None
 
 
-def _index_problem() -> str:
-    try:
-        idx = json.loads((kb.md_dir() / "command_index.json").read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return "コマンド索引が読めません"
+def _index_problem(idx: dict = None) -> str:
+    if idx is None:
+        try:
+            idx = json.loads((kb.md_dir() / "command_index.json").read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return "コマンド索引が読めません"
     if idx.get("commands") and "params" not in idx["commands"][0]:
         return "コマンド索引が旧形式です（パラメータ表・説明・未設定時の欄が無い）"
     return ""
 
 
-def local_status(ver: dict) -> list:
+def local_status(ver: dict, idx: dict = None) -> list:
     """手元のKBが検証済みの版より古い理由のリスト（ネットワークを使わない判定。古くなければ空）。
 
     検証済みの版より新しい版を取り込んだKB（サイトが先に改版した）は古いとは言えないので、
     マニュアルは Last-Modified の前後で判定する。設定例の指紋は新旧の順が分からないので、
     記録が無いことだけを見る（中身の新旧はネットワークありの check_updates が見る）。
+    idx は読み込み済みのコマンド索引（status が既に読んでいるので二度読みしないため）。
     """
     if not kb.is_built():
         return ["知識ベースが未構築です"]
@@ -158,7 +160,7 @@ def local_status(ver: dict) -> list:
     if unrecorded:
         # 2.3.0 より前に取得したKBは指紋を記録していない。中身が同じかは判断できないので取り直させる
         out.append(f"設定例 {len(unrecorded)} 件に本文の指紋の記録がありません（2.3.0 より前に取得したKB）")
-    problem = _index_problem()
+    problem = _index_problem(idx)
     if problem:
         out.append(problem)
     return out
@@ -169,9 +171,10 @@ def last_contact(state: dict):
     times = []
     for key in ("last_fetch", "last_checked"):
         try:
-            times.append(datetime.fromisoformat(state[key]))
+            t = datetime.fromisoformat(state[key])
         except (KeyError, TypeError, ValueError):
-            pass
+            continue
+        times.append(t if t.tzinfo else t.replace(tzinfo=timezone.utc))   # 手で書かれた値に備える
     return max(times) if times else None
 
 

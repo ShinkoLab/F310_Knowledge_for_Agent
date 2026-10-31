@@ -104,6 +104,9 @@ class ContactNoteTest(unittest.TestCase):
         state = {"last_fetch": "2026-10-01T00:00:00+00:00", "last_checked": "2026-12-30T00:00:00+00:00"}
         self.assertEqual(validated.contact_note(state, self.NOW), "")
 
+    def test_naive_timestamp_is_treated_as_utc(self):
+        self.assertEqual(validated.contact_note({"last_fetch": "2026-12-20T00:00:00"}, self.NOW), "")
+
     def test_broken_value_is_ignored(self):
         self.assertIn("記録がありません", validated.contact_note({"last_fetch": "yesterday"}, self.NOW))
 
