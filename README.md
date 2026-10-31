@@ -22,8 +22,8 @@
 
 | 対象 | 規模 |
 |---|---|
-| 純正マニュアル | 16冊 / 3,949ページ（コンテナ(LXC)関連6冊を含む） |
-| コマンド索引 | 1,914コマンド（構成定義編 1,299 + 運用管理編 615） |
+| 純正マニュアル | 16冊 / 4,021ページ（コンテナ(LXC)関連6冊を含む） |
+| コマンド索引 | 1,964コマンド（構成定義編 1,332 + 運用管理編 632） |
 | 公式設定例・コンテナ説明書 | 56件（IPoE・IPsec/VPN・VRRP・OSPF/BGP・QoS・LBO・コンテナ ほか） |
 
 ## クイックスタート
@@ -55,7 +55,7 @@ Claude Code で:
 python3 scripts/build.py
 ```
 
-公式サイトからマニュアルPDF 16冊（約45MB）と設定例・コンテナ説明書ページ 56件を取得し、変換・索引化します。
+公式サイトからマニュアルPDF 16冊（約46MB）と設定例・コンテナ説明書ページ 56件を取得し、変換・索引化します。
 サイトへの負荷を避けて逐次・1秒間隔で取得するため、初回は数分かかります。
 
 ## 知識ベース
@@ -72,7 +72,7 @@ Claude Code 公式のプラグインデータ置き場（`${CLAUDE_PLUGIN_DATA}`
 ├─ html/*.html            # 取得した設定例・コンテナ説明書ページ（UTF-8化済）
 └─ md/
    ├─ *.md                # ページ番号マーカー付き全文
-   ├─ command_index.json  # 全1,914コマンドの索引
+   ├─ command_index.json  # 全1,964コマンドの索引
    └─ setting_examples/   # 設定例・コンテナ説明書56件 + INDEX.md
 ```
 
@@ -86,13 +86,17 @@ Claude Code 公式のプラグインデータ置き場（`${CLAUDE_PLUGIN_DATA}`
 | オプション | 内容 |
 |---|---|
 | `--dry-run` | 全URLの疎通確認のみ（リンク切れの検出用） |
+| `--check-updates` | 公式サイトが検証済みの版から改版されていないかを調べる（KBには触れない。変化があれば終了コード1） |
+| `--accept-current` | 手元のKBの版と件数を「検証済みの版」として `data/validated_versions.json` に書き出す（保守者向け） |
 | `--skip-fetch` | 取得を省き、手元のPDF/HTMLから再生成のみ |
 | `--force` | 取得済みでも取り直す |
 | `--seed DIR` | 手元にある `original/*.pdf` を流用してダウンロードを省く |
 | `--prune-pdf` | 変換後にPDFを削除して容量を空ける（図の確認はできなくなる） |
 
-ビルド末尾で網羅性（3,949ページ / 1,914コマンド / 設定例56件）を自動チェックします。
-値がズレた場合は、取得漏れかサイト側の改版が疑われます。
+ビルド末尾で、網羅性（冊ごとのページ数・コマンド数・設定例の件数）と検索の回帰テストを自動チェックします。
+基準は `data/validated_versions.json` に記録した「検証済みの版」です。公式サイトが改版されて手元の版が
+これと違う場合は、数が変わっても警告ではなく注記になります。
+設定例ページは更新日時を返さないため、通常のビルドで毎回取得し、本文が変わっていれば取り直します。
 
 ### v1.0.0 からの移行
 
@@ -113,7 +117,7 @@ mkdir -p ~/.claude/plugins/data && mv ~/.claude/f310-kb ~/.claude/plugins/data/f
 python3 scripts/lookup.py status                    # 構築状況
 python3 scripts/lookup.py cmd "^router ospf" --full # コマンド構文
 python3 scripts/lookup.py grep "link up" message    # 本文検索（出典ページ付き）
-python3 scripts/lookup.py page cmd_refe_config 190  # ページ本文
+python3 scripts/lookup.py page cmd_refe_config 195  # ページ本文
 python3 scripts/lookup.py ex "v6プラス"              # 設定例検索
 ```
 

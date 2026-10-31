@@ -53,14 +53,14 @@ F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/looku
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "MTU" --desc
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" cmd "vrf" --manual cmd_refe_ope
 
-# 本文検索（"message.pdf p.414: …" の形で出典付きで返る。対象は省略時 全16冊）
+# 本文検索（"message.pdf p.420: …" の形で出典付きで返る。対象は省略時 全16冊）
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "link up" message
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "MAP-E" kinou siyou
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" grep "container enable" lxc_app_man
 
 # ページ本文（N または N-M）
-F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 190
-F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page message 414-415
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page cmd_refe_config 195
+F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" page message 420-421
 
 # 設定例（索引＋本文。完成コンフィグ内のコマンド名でも引ける）
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/lookup.py" ex "v6プラス"
@@ -93,7 +93,7 @@ PDFを開く必要があるのは、構成図・写真などテキストに無�
 
 | 情報源 | 出典の書き方 |
 |---|---|
-| マニュアル | `cmd_refe_config.pdf p.190` — `lookup.py` の出力にそのまま入っている |
+| マニュアル | `cmd_refe_config.pdf p.195` — `lookup.py` の出力にそのまま入っている |
 | 設定例 | 各mdファイル冒頭の `**出典**:` のURL |
 
 ページ番号は**PDF物理ページ**であり、紙面に印字されたページ番号とは一致しないことがある。

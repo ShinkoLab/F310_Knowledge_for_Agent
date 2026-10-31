@@ -27,6 +27,7 @@ REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 MANUALS_MANIFEST = DATA / "manuals_manifest.json"
 EXAMPLES_MANIFEST = DATA / "examples_manifest.json"
+VALIDATED = DATA / "validated_versions.json"   # パーサを検証した時点の版（本文は含まない）
 
 FALLBACK_ID = "f310-kb-shinko-lab"
 

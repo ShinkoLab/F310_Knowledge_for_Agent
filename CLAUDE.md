@@ -58,20 +58,51 @@ hook / MCP / LSP サブプロセスだけで、素の Bash 実行で見える値
 ```bash
 python3 scripts/build.py              # 取得 → 変換 → 索引 → 網羅性チェック
 python3 scripts/build.py --skip-fetch # 手元のPDF/HTMLから再生成のみ（ロジック変更時はこれ）
-python3 scripts/build.py --dry-run    # 全URLの疎通確認（サイト改版の一次診断）
+python3 scripts/build.py --dry-run    # 全URLの疎通確認（リンク切れの一次診断）
+python3 scripts/build.py --check-updates  # 公式サイトが検証済みの版から改版されたか（KBに触れない）
+python3 scripts/build.py --accept-current # 手元のKBを検証済みの版として記録する
 ```
 
 ## 網羅性の基準値（退行検知）
 
-`build.py` が末尾で自動チェックする。抽出ロジックを触ったら、この値が崩れていないか必ず確認すること。
+`build.py` が末尾で自動チェックする。基準値は `data/validated_versions.json` に持つ。中身はパーサを検証した
+時点の公式サイトの版で、冊ごとの Last-Modified・バイト数・ページ数・コマンド数、設定例ページごとの本文の指紋、
+設定例md件数（本文は含まない）。2026-10 版で 4,021ページ / 1,964コマンド（構成定義編 1,332 / 運用管理編 632）/ 設定例md 56件。
 
-| 項目 | 値 |
-|---|---|
-| 総ページ数 | 3,949（マニュアル10冊 3,873 + コンテナ関連6冊 76） |
-| コマンド数 | 構成定義編 1,299 / 運用管理編 615（計1,914） |
-| 設定例md | 56件（うちコンテナ説明書HTML 2件） |
+- 手元の版が検証済みの版と同じなのに数が違えば、抽出ロジックの退行か取得漏れとして警告する。
+- 手元の版が検証済みの版と違う冊は、サイト側の改訂で数が変わるのは想定どおりなので、警告ではなく注記になる。
+  抽出結果を確認し、`python3 scripts/build.py --accept-current` で検証済みの版を更新してコミットする。
+- 抽出ロジックを触ったら、手元の版が検証済みの版と一致している状態でチェックが通ることを確認する。
+- 公式サイトの改版は `python3 scripts/build.py --check-updates` でKBに触れず調べられる。変化があれば終了コード1。
+- 設定例ページは Last-Modified も ETag も返さないため、本文（`<main>` または `<div id="contents">` の範囲）の
+  sha256 で判定する。正規化規則（`fetch_examples.fingerprint()`）を変えると記録済みの指紋が全部無効になる。
 
 抽出漏れは凡例（マニュアル冒頭のマーカー説明）2件のみで、これは意図的に除外している。
+
+### 検索の回帰テスト
+
+`build.py` は末尾で `scripts/check_retrieval.py` を呼び、`tests/retrieval_cases.json` のケース
+（既知の質問が既知の答えを返すか）を評価する。件数が合っていても「語を変えると0件」「modeに表が混ざる」
+といった退行はここで拾う。失敗は網羅性の警告と同じ扱い。単独でも実行できる。
+
+    python3 scripts/check_retrieval.py            # 全ケース（--list で一覧、--id で個別）
+
+- ケースにマニュアル本文は入れない（マニュアル名・ページ番号・コマンド名・設定例のファイル名・件数の下限だけ）。
+- ページ番号の完全一致は `page_dependent: true` のケースに限る。版が検証済みの版と違う冊のページ依存ケースが落ちても、
+  `build.py` は警告にせず注記に回す。`--accept-current` で版を更新するときに、ここのページ番号も合わせて直す。
+  版が同じなのに落ちたら退行。
+- 検索・抽出ロジック（lookup.py / build_command_index.py）を変えたときは、変更前後の
+  command_index.json を `python3 scripts/diff_index.py old.json new.json` で比べ、意図した欄だけが変わったか確認する。
+
+### 単体テスト
+
+KB もネットワークも不要の単体テストが `tests/` にある（標準ライブラリ unittest のみ、CI なし）。
+
+    python3 -m unittest discover -s tests
+
+入力はすべて合成データ（マニュアル本文をコピーしないこと）。パーサ（`build_command_index`）・リニアライザ
+（`gen_examples`）・`fuzzy_pattern`・`kb_paths` の挙動を固定している。抽出ロジックを触ったら、網羅性チェックに
+加えてこれも通すこと。
 
 この表の数値を `skills/lookup/SKILL.md` の `description` に書かないこと。自動起動の判定に効くのは
 固有名（`v6プラス`・`softflowd`・`squid` 等）であって数値ではなく、書くと内容を足すたびに
@@ -95,6 +126,8 @@ description の更新が必要になる。規模を示すのは README と `manu
 
 - **mode は最初の段落だけ**。【動作モード】の直後に表の見出し（パラメータ/設定内容…）や次ページのヘッダが
   続けて出るため、空行かページ区切りで打ち切る。複数モードの折り返し（空行なしの複数行）は正常。
+  ただし折り返しの途中に空行が挟まることがある（「…インタフェー」⏎⏎「ス設定モード」）ので、空行の手前が
+  モード名の終わり（`モード`・`）`）に見えないときは、表の見出しが来ない限り次の段落へ続ける。
 - **パラメータ表は元の位置にいない**。「パラメータ／設定内容」で始まる表を本文から切り出し、
   約4割は後ろのコマンドのブロックやページ末尾に回っている。持ち主は【パラメータ】見出しの待ち行列と、
   表の先頭セルが構文に含まれるかで決める（`assign_tables()`）。割当は推定で、約3%は構文で裏が取れない。
@@ -144,6 +177,6 @@ F310 は V01.00 以降が対応。パイプラインは既存のものをその�
 
 ## マニュアルPDFを差し替え・追加するとき
 
-`data/manuals_manifest.json` にURLとページ数を足し、`python3 scripts/build.py --force` で取り直す。
-ページ数が変わったら `scripts/build.py` の `EXPECT_PAGES` と、
-`skills/lookup/references/manuals_index.md` の表も更新すること。
+`data/manuals_manifest.json` にURLを足し（ページ数はもう書かない）、`python3 scripts/build.py --force` で取り直す。
+続けて `python3 scripts/build.py --accept-current` で検証済みの版を更新し、
+`skills/lookup/references/manuals_index.md` の表と README の規模の数値も合わせて更新すること。
