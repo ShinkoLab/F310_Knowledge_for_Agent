@@ -74,6 +74,14 @@ def pages_per_book() -> dict:
     return {md.stem: pages_on_disk(only={md.stem}) for md in sorted(kb.md_dir().glob("*.md"))}
 
 
+def changed_books() -> set:
+    """手元のPDFが検証済みの版と違う冊の stem。ページ番号のずれを退行と区別するのに使う。"""
+    ver = validated.load().get("manuals", {})
+    seen = kb.load_state().get("manuals")
+    seen = seen if isinstance(seen, dict) else {}
+    return {name[:-4] for name, v in ver.items() if validated.manual_changed(seen.get(name), v)}
+
+
 def verify(pages: int, counts: dict, examples: int) -> list[str]:
     """網羅性を、検証済みの版（data/validated_versions.json）の冊ごとの値と突き合わせる。
 
@@ -104,7 +112,7 @@ def verify(pages: int, counts: dict, examples: int) -> list[str]:
         msg = f"設定例md {examples} 件（検証済み {ver.get('example_count')}）"
         (newer if validated.examples_changed(ex_seen, ver.get("examples", {})) else warn).append(msg)
     if newer:
-        print("\n手元の版が検証済みの版より新しい箇所があります。数が変わるのは想定どおりです。\n"
+        print("\n手元の版が検証済みの版と違う箇所があります。数が変わるのは想定どおりです。\n"
               "抽出結果を確認したうえで、問題なければ build.py --accept-current で検証済みの版を更新してください:")
         for m in newer:
             print(f"    - {m}")
@@ -229,7 +237,8 @@ def main() -> int:
         warn.insert(0, f"マニュアルPDFの取得に {man_failed} 冊失敗"
                        "（ネットワークとURLを確認し --force で取り直してください）")
     # 件数が合っていても語が引けなくなる等の退行を拾う。失敗は網羅性の警告と同じ扱い。
-    warn.extend(check_retrieval.as_warnings())
+    # ただし版が違う冊のページ依存ケースは、ページ番号がずれただけのことがあるので注記に回す。
+    warn.extend(check_retrieval.as_warnings(changed=changed_books()))
     if warn:
         print("\n⚠ 想定値と一致しません。取得漏れか抽出ロジックの退行が疑われます:")
         for w in warn:

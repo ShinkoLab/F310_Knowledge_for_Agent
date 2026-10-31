@@ -71,6 +71,15 @@ class FirstParagraphTest(unittest.TestCase):
         self.assertEqual(bci.first_paragraph(lines),
                          "基本設定モード\nインターフェース設定モード")
 
+    def test_wrap_across_blank_line_is_joined(self):
+        lines = ["", "基本設定モード、甲インタフェー", "", "ス設定モード", "", "余計な段落"]
+        self.assertEqual(bci.first_paragraph(lines),
+                         "基本設定モード、甲インタフェー\nス設定モード")
+
+    def test_unterminated_mode_stops_at_param_head(self):
+        lines = ["甲のコマンドレベル", "", "パラメータ", "設定内容"]
+        self.assertEqual(bci.first_paragraph(lines), "甲のコマンドレベル")
+
     def test_cut_at_page_marker(self):
         lines = ["基本設定モード", "===== PAGE 3 =====", "続き"]
         self.assertEqual(bci.first_paragraph(lines), "基本設定モード")

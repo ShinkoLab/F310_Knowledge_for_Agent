@@ -196,15 +196,30 @@ def squash(s: str) -> str:
     return re.sub(r"[\s<>\[\]{}()|（）,]", "", s)
 
 
+MODE_END_RE = re.compile(r"(モード|）|\))$")
+
+
 def first_paragraph(lines) -> str:
-    """最初の段落（空行かページ区切りまで）。複数モードの折り返しは同じ段落に入る。"""
-    out = []
+    """最初の段落（空行かページ区切りまで）。複数モードの折り返しは同じ段落に入る。
+
+    折り返しの途中に空行が挟まることがある（「…インタフェー」⏎⏎「ス設定モード」）。
+    空行の手前がモード名の終わりに見えないときは、表の見出しが来ない限り次の段落へ続ける。
+    """
+    out, gap = [], False
     for ln in lines:
         s = ln.strip()
-        if PAGE_RE.match(ln) or (not s and out):
+        if PAGE_RE.match(ln):
             break
-        if s:
-            out.append(s)
+        if not s:
+            if out:
+                if MODE_END_RE.search(out[-1]):
+                    break
+                gap = True
+            continue
+        if gap and s in PARAM_HEAD:
+            break
+        out.append(s)
+        gap = False
     return "\n".join(out)
 
 

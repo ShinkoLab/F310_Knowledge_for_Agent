@@ -212,14 +212,34 @@ def run(cases_path: Path = None, only: list = None, quiet: bool = False) -> tupl
     return len(cases), failures
 
 
-def as_warnings() -> list:
-    """build.py 用。失敗を網羅性チェックの警告と同じ「1行の文字列」にして返す。"""
+def case_manuals(case: dict) -> set:
+    """ページ依存ケースが期待しているマニュアルの stem（"m:N" / "cmd@m:N" から拾う）。"""
+    exp = case.get("expect", {})
+    refs = exp.get("refs", []) + exp.get("pages", []) + exp.get("command_refs", [])
+    return {r.split("@")[-1].split(":")[0] for r in refs}
+
+
+def as_warnings(changed: set = frozenset()) -> list:
+    """build.py 用。失敗を網羅性チェックの警告と同じ「1行の文字列」にして返す。
+
+    changed は手元の版が検証済みの版と違う冊。その冊を期待するページ依存ケースの失敗は
+    改版でページがずれただけのことがあるので、警告に入れず注記として表示する。
+    """
     try:
         total, failures = run(quiet=True)
     except Exception as e:  # ケースJSONの破損などで構築全体を落とさない
         return [f"検索回帰テストを実行できません: {type(e).__name__}: {e}"]
+    shifted = [(c, r) for c, r in failures
+               if c.get("page_dependent") and case_manuals(c) & set(changed)]
+    failures = [f for f in failures if f not in shifted]
     if not failures:
-        print(f"  検索回帰    {total}/{total} 件成功")
+        print(f"  検索回帰    {total - len(shifted)}/{total} 件成功"
+              + (f"（ほか {len(shifted)} 件は版違いでページがずれた可能性）" if shifted else ""))
+    if shifted:
+        print("\n版が違う冊のページ依存ケースが落ちました。改版でページがずれただけなら、"
+              "--accept-current のときに tests/retrieval_cases.json のページも更新してください:")
+        for c, reasons in shifted:
+            print(f"    - {c['id']}: {'; '.join(reasons)}")
     out = []
     for c, reasons in failures:
         dep = "（ページ依存）" if c.get("page_dependent") else ""

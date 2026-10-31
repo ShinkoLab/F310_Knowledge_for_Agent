@@ -118,7 +118,7 @@ def f310_grep(
     case: bool = False,
     limit: int = 40,
 ) -> str:
-    """マニュアル本文を正規表現で全文検索し、出典ページ付きで返す（例: "message.pdf p.414: …"）。
+    """マニュアル本文を正規表現で全文検索し、出典ページ付きで返す（例: "message.pdf p.420: …"）。
     manuals 省略時は全マニュアル（コンテナ関連を含む）が対象。用途別の絞り込み:
     ログ/エラーの意味 → manuals=["message"]。対応本数・性能値・MIB/Trap → ["siyou"]。
     機能説明 → ["kinou"]。障害切り分け → ["trouble"]。
