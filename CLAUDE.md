@@ -17,6 +17,7 @@ Claude Code プラグイン**。リポジトリが持つのは「取得先URL・
 ```
 .claude-plugin/       plugin.json / marketplace.json
 skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
+skills/update/        SKILL.md（更新の確認と取り直し。disable-model-invocation で /f310-kb:update からだけ動く）
 scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
                       gen_examples*, build.py（統合）, lookup.py（検索）,
                       validated.py（検証済みの版の照合・改版検知）, check_retrieval.py（検索回帰テスト）,
@@ -64,7 +65,7 @@ hook / MCP / LSP サブプロセスだけで、素の Bash 実行で見える値
 python3 scripts/build.py              # 取得 → 変換 → 索引 → 網羅性チェック
 python3 scripts/build.py --skip-fetch # 手元のPDF/HTMLから再生成のみ（ロジック変更時はこれ）
 python3 scripts/build.py --dry-run    # 全URLの疎通確認（リンク切れの一次診断）
-python3 scripts/build.py --check-updates  # 公式サイトの改版と手元のKBの遅れを調べる（KBに書かない）
+python3 scripts/build.py --check-updates  # 公式サイトの改版と手元のKBの遅れを調べる（KBの中身は変えない）
 python3 scripts/build.py --accept-current # 手元のKBを検証済みの版として記録する
 ```
 
@@ -78,9 +79,18 @@ python3 scripts/build.py --accept-current # 手元のKBを検証済みの版と�
 - 手元の版が検証済みの版と違う冊は、サイト側の改訂で数が変わるのは想定どおりなので、警告ではなく注記になる。
   抽出結果を確認し、`python3 scripts/build.py --accept-current` で検証済みの版を更新してコミットする。
 - 抽出ロジックを触ったら、手元の版が検証済みの版と一致している状態でチェックが通ることを確認する。
-- 公式サイトの改版は `python3 scripts/build.py --check-updates` でKBに書き込まず調べられる。サイト側と手元のKB側を
+- 公式サイトの改版は `python3 scripts/build.py --check-updates` で、KBの中身を変えずに調べられる。サイト側と手元のKB側を
   分けて表示する（「サイトは変わっていない」だけを出すと、手元のKBが旧版でも最新だと読み違えるため）。
-  手元のKBは `.build.json` の記録と索引の形式（`params` 欄の有無）で判定する。どちらかに更新が要れば終了コード1。
+  どちらかに何かあれば終了コード1。全件に問い合わせられたときだけ、確認した日時を `.build.json` の `last_checked` に記録する。
+- **手元のKBの「古い」は、比べる相手で2通りある。** 混ぜると、サイトが先に改版してそれを取り込んだKBが
+  いつまでも古いと言われ続ける。
+  - `--check-updates`（ネットワークあり）: 手元の記録（`.build.json`）を**いまの公式サイト**と比べる。
+  - `lookup.py status`（ネットワークなし。`validated.local_status()`）: 手元が**検証済みの版より古いか**を、
+    マニュアルは Last-Modified の前後で判定する。設定例の指紋は新旧の順が無いので、記録が無いことだけを見る。
+    索引の形式（`params` 欄の有無）も見る。あわせて、公式サイトとの最後の突き合わせ（`last_fetch` / `last_checked`）から
+    `STALE_DAYS`（30日）を超えていれば案内する。
+- 更新の実行は `skills/update/SKILL.md`（`/f310-kb:update`）に任せる。`lookup` スキルは案内を添えるだけで、
+  自分からは取得しない（数分かかり、公式サイトにもアクセスするため）。
 - 設定例ページは Last-Modified も ETag も返さないため、本文（`<main>` または `<div id="contents">` の範囲）の
   sha256 で判定する。正規化規則（`fetch_examples.fingerprint()`）を変えると記録済みの指紋が全部無効になる。
 

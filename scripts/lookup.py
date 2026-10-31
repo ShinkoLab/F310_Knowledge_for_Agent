@@ -18,6 +18,7 @@ import sys
 import unicodedata
 
 import kb_paths as kb
+import validated
 
 BUILD_HINT = (
     "知識ベースが未構築です。次のコマンドで構築してください（公式サイトから約48MBを取得します）:\n"
@@ -125,6 +126,19 @@ def cmd_status(args) -> int:
     print(f"  索引生成日  {idx.get('generated', '?')}")
     if not kb.original_dir().exists() or not any(kb.original_dir().glob("*.pdf")):
         print("  ※ PDF原本は保持していません（図の確認が必要なら再取得が要ります）")
+    # ネットワークを使わない鮮度の判定。古くても検索はできるので、案内だけして 0 を返す
+    notes = validated.local_status(validated.load(), idx)
+    stale = validated.contact_note(state)
+    if notes or stale:
+        print("  更新の案内:")
+        for n in notes + ([stale] if stale else []):
+            print(f"    - {n}")
+        build = kb.REPO / "scripts" / "build.py"
+        if notes:
+            print(f"    更新するには: python3 {build}（Claude Code では /f310-kb:update）")
+        else:
+            print(f"    公式サイトの更新を確認するには: python3 {build} --check-updates"
+                  "（Claude Code では /f310-kb:update）")
     return 0
 
 

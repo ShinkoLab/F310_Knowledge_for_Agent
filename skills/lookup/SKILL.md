@@ -23,7 +23,12 @@ F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/looku
 F310_KB_DIR="${CLAUDE_PLUGIN_DATA}" python3 "${CLAUDE_PLUGIN_ROOT}/scripts/build.py"
 ```
 
-`mutool` が無いと止まる（`brew install mupdf-tools`）。構築済みなら以降このステップは黙って飛ばす。
+`mutool` が無いと止まる（`brew install mupdf-tools`）。
+
+**構築済みで `更新の案内:` が出た場合**は、回答の冒頭か末尾で一言だけ、`status` が出した案内（「更新するには」か
+「公式サイトの更新を確認するには」の行）に沿って `/f310-kb:update` を添え、質問への回答はそのまま続ける（古くても検索はできる）。更新は自分から実行しない。
+取得に数分かかり、公式サイトにもアクセスするため、利用者が `/f310-kb:update` で呼んだときだけ行う。
+案内が無ければ、以降このステップは黙って飛ばす。
 
 ## 1. どこを引くか
 
