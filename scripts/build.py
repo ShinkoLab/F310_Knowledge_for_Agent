@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import build_command_index
+import check_retrieval
 import convert_to_md
 import fetch_examples
 import fetch_manuals
@@ -227,6 +228,8 @@ def main() -> int:
     if man_failed:
         warn.insert(0, f"マニュアルPDFの取得に {man_failed} 冊失敗"
                        "（ネットワークとURLを確認し --force で取り直してください）")
+    # 件数が合っていても語が引けなくなる等の退行を拾う。失敗は網羅性の警告と同じ扱い。
+    warn.extend(check_retrieval.as_warnings())
     if warn:
         print("\n⚠ 想定値と一致しません。取得漏れか抽出ロジックの退行が疑われます:")
         for w in warn:
