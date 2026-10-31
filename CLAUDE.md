@@ -64,7 +64,7 @@ hook / MCP / LSP サブプロセスだけで、素の Bash 実行で見える値
 python3 scripts/build.py              # 取得 → 変換 → 索引 → 網羅性チェック
 python3 scripts/build.py --skip-fetch # 手元のPDF/HTMLから再生成のみ（ロジック変更時はこれ）
 python3 scripts/build.py --dry-run    # 全URLの疎通確認（リンク切れの一次診断）
-python3 scripts/build.py --check-updates  # 公式サイトが検証済みの版から改版されたか（KBに触れない）
+python3 scripts/build.py --check-updates  # 公式サイトの改版と手元のKBの遅れを調べる（KBに書かない）
 python3 scripts/build.py --accept-current # 手元のKBを検証済みの版として記録する
 ```
 
@@ -78,7 +78,9 @@ python3 scripts/build.py --accept-current # 手元のKBを検証済みの版と�
 - 手元の版が検証済みの版と違う冊は、サイト側の改訂で数が変わるのは想定どおりなので、警告ではなく注記になる。
   抽出結果を確認し、`python3 scripts/build.py --accept-current` で検証済みの版を更新してコミットする。
 - 抽出ロジックを触ったら、手元の版が検証済みの版と一致している状態でチェックが通ることを確認する。
-- 公式サイトの改版は `python3 scripts/build.py --check-updates` でKBに触れず調べられる。変化があれば終了コード1。
+- 公式サイトの改版は `python3 scripts/build.py --check-updates` でKBに書き込まず調べられる。サイト側と手元のKB側を
+  分けて表示する（「サイトは変わっていない」だけを出すと、手元のKBが旧版でも最新だと読み違えるため）。
+  手元のKBは `.build.json` の記録と索引の形式（`params` 欄の有無）で判定する。どちらかに更新が要れば終了コード1。
 - 設定例ページは Last-Modified も ETag も返さないため、本文（`<main>` または `<div id="contents">` の範囲）の
   sha256 で判定する。正規化規則（`fetch_examples.fingerprint()`）を変えると記録済みの指紋が全部無効になる。
 

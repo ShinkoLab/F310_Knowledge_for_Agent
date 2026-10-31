@@ -6,8 +6,8 @@
   索引: コマンド索引 JSON、設定例 INDEX.md
 
 取得は毎回サイトと突き合わせる（PDFは Last-Modified、設定例は本文の指紋）。改訂があれば取り直す。
---check-updates はKBに触れず、サイトが検証済みの版（data/validated_versions.json）から
-変わっていないかだけを調べる。検証し直した版は --accept-current で記録する。
+--check-updates はKBに書き込まず、公式サイトと手元のKBのそれぞれが検証済みの版
+（data/validated_versions.json）と同じかを調べる。検証し直した版は --accept-current で記録する。
 
 出力先は $F310_KB_DIR、未設定なら ~/.claude/plugins/data/f310-kb-shinko-lab。
 依存は python3 と mutool(MuPDF) のみ。pip 不要。
@@ -125,7 +125,7 @@ def main() -> int:
     ap.add_argument("--force", action="store_true", help="取得済みでも再取得する")
     ap.add_argument("--dry-run", action="store_true", help="全URLの疎通確認のみ（保存も生成もしない）")
     ap.add_argument("--check-updates", action="store_true",
-                    help="公式サイトが検証済みの版から変わっていないか調べる（KBには書かない。変化があれば終了コード1）")
+                    help="公式サイトと手元のKBが検証済みの版と同じか調べる（KBには書かない。サイトの変化か手元の遅れがあれば終了コード1）")
     ap.add_argument("--accept-current", action="store_true",
                     help="手元のKBの現状を検証済みの版として data/validated_versions.json に書き出す（保守者向け）")
     ap.add_argument("--seed", metavar="DIR", help="既存の original/*.pdf をコピーしてDLを省く")

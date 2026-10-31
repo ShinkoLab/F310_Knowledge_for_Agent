@@ -9,7 +9,7 @@ data/validated_versions.json に、検証したときの版を本文なしで持
 用途は2つ。
   - build.py の網羅性チェック: 手元の版が検証済みの版と同じなのに数が違えば抽出の退行、
     版が違うなら数が変わるのは想定どおり（検証し直して更新する）、と区別できる。
-  - build.py --check-updates: 公式サイトが検証済みの版から変わっていないかをKBに触れず調べる。
+  - build.py --check-updates: 公式サイトと手元のKBのそれぞれが検証済みの版と同じかを、KBに書かずに調べる。
 
 更新は build.py --accept-current（手元のKBの現状を検証済みの版にする）。
 """
@@ -102,11 +102,46 @@ def accept_current(pages_by_book: dict, counts: dict, example_count: int) -> int
     return 0
 
 
+def local_status(ver: dict) -> list:
+    """手元のKBが検証済みの版に追いついていない理由のリスト（追いついていれば空）。
+
+    --check-updates はサイトと検証済みの版を比べるだけなので、それが「変化なし」でも
+    手元のKBが旧版のことがある。その取り違えを防ぐために、手元の記録（.build.json）と索引も見る。
+    """
+    if not kb.is_built():
+        return ["知識ベースが未構築です"]
+    state = kb.load_state()
+    seen = state.get("manuals") if isinstance(state.get("manuals"), dict) else {}
+    ex_seen = state.get("examples") if isinstance(state.get("examples"), dict) else {}
+    out = []
+    old = [n for n, v in ver.get("manuals", {}).items()
+           if not seen.get(n) or manual_changed(seen.get(n), v)]
+    if old:
+        out.append(f"マニュアルPDF {len(old)} 冊が検証済みの版と違うか、取得の記録がありません"
+                   f"（{', '.join(n[:-4] for n in old)}）")
+    want = ver.get("examples", {})
+    unrecorded = [n for n in want if not (ex_seen.get(n) or {}).get("sha256")]
+    if unrecorded:
+        # 2.3.0 より前に取得したKBは指紋を記録していない。中身が同じかは判断できないので取り直させる
+        out.append(f"設定例 {len(unrecorded)} 件に本文の指紋の記録がありません（2.3.0 より前に取得したKB）")
+    stale = [n for n in want if n not in unrecorded and ex_seen[n]["sha256"] != want[n]]
+    if stale:
+        out.append(f"設定例 {len(stale)} 件の本文が検証済みの版と違います")
+    try:
+        idx = json.loads((kb.md_dir() / "command_index.json").read_text(encoding="utf-8"))
+        if idx.get("commands") and "params" not in idx["commands"][0]:
+            out.append("コマンド索引が旧形式です（パラメータ表・説明・未設定時の欄が無い）")
+    except (OSError, json.JSONDecodeError):
+        out.append("コマンド索引が読めません")
+    return out
+
+
 def check_updates() -> int:
-    """公式サイトを検証済みの版と突き合わせる。KBには書かない。変化・リンク切れがあれば 1。
+    """公式サイトと手元のKBを、それぞれ検証済みの版と突き合わせる。KBには書かない。
 
     マニュアルは HEAD（Last-Modified / Content-Length）、設定例は GET して指紋を比べる
-    （設定例のページは更新日時を返さないため）。
+    （設定例のページは更新日時を返さないため）。手元のKBは .build.json と索引だけを見る。
+    サイトに変化・リンク切れがあるか、手元のKBが追いついていなければ 1。
     """
     ver = load()
     if not ver.get("manuals"):
@@ -163,10 +198,24 @@ def check_updates() -> int:
     if not bad:
         print("  すべて検証済みの版と同じ")
 
+    behind = local_status(ver)
+    print(f"\n== 手元のKB（{kb.kb_root()}）==")
+    for why in behind:
+        print(f"  OLD     {why}")
+    if not behind:
+        print("  検証済みの版と同じ")
+
+    build = kb.REPO / "scripts" / "build.py"
+    print("\n== 結果 ==")
     if bad:
-        print(f"\n変化・リンク切れ: {bad} 件。パーサの検証が必要かもしれません。"
-              "\n  1) python3 scripts/build.py で取り直す  2) 抽出結果と網羅性チェックを確認"
-              "\n  3) python3 scripts/build.py --accept-current で検証済みの版を更新")
-        return 1
-    print("\n公式サイトは検証済みの版から変わっていません。")
-    return 0
+        print(f"  公式サイト: 検証済みの版から変化・リンク切れが {bad} 件あります（パーサの検証が要るかもしれません）。"
+              f"\n    保守者は 1) python3 {build} で取り直す  2) 抽出結果と網羅性チェックを確認"
+              f"\n    3) python3 {build} --accept-current で検証済みの版を更新")
+    else:
+        print("  公式サイト: 検証済みの版から変わっていません。")
+    if behind:
+        print(f"  手元のKB:   検証済みの版に追いついていません。次のコマンドで更新してください（取得あり）:"
+              f"\n    python3 {build}")
+    else:
+        print("  手元のKB:   最新です（検証済みの版と同じ）。")
+    return 1 if bad or behind else 0
