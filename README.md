@@ -144,7 +144,17 @@ python3 scripts/build.py
 
 `mcp` パッケージはこのMCPサーバー専用のオプション依存です。このリポジトリ唯一の pip 依存であり、
 macOS のシステム/Homebrew Python では素の `pip install` が `externally-managed-environment`
-エラーになることがあるため、venv を切って使うことを推奨します。
+エラーになることがあるため、venv を切って使います。次の1コマンドで、venv の作成から
+`mcp` のインストール、読み込みの確認までを行い、最後にクライアント設定の雛形を**このリポジトリの
+絶対パス入りで**表示します（設定ファイル自体は書き換えません）。
+
+```bash
+python3 scripts/setup_mcp.py              # .venv-mcp を作って mcp を入れ、設定例を表示
+python3 scripts/setup_mcp.py --print-only # 設定例だけ表示
+```
+
+`python3` が 3.9 でも、PATH 上の `python3.10`〜`python3.14` を探して venv を作ります。
+見つからないときは `--python /path/to/python3.12` で指定してください。手で作る場合は次のとおりです。
 
 > [!WARNING]
 > **venv は Python 3.10 以降で作ってください。** `mcp` SDK 自体が 3.10 以上を要求するため、
@@ -162,8 +172,8 @@ python3 -m venv .venv-mcp   # python3 は 3.10 以降であること
 
 ### クライアント側の設定
 
-以下のパスは全て例です。**venv の Python 実行ファイルと `scripts/mcp_server.py` の絶対パス**に
-置き換えてください。
+`setup_mcp.py` が表示したものを貼り付けるのが確実です。以下のパスは全て例で、手で書く場合は
+**venv の Python 実行ファイルと `scripts/mcp_server.py` の絶対パス**に置き換えてください。
 
 OpenCode（`opencode.json`）:
 

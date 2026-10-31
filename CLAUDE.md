@@ -19,8 +19,13 @@ Claude Code プラグイン**。リポジトリが持つのは「取得先URL・
 skills/lookup/        SKILL.md（スキル本体）、references/manuals_index.md（ルーティング表）
 scripts/              kb_paths, httpget, fetch_*, convert_to_md, build_command_index,
                       gen_examples*, build.py（統合）, lookup.py（検索）,
-                      mcp_server.py（MCP stdio サーバ。lookup.py の cmd_* を薄くラップ。任意・pip依存）
-data/                 manuals_manifest.json（PDF16冊のURL）, examples_manifest.json（設定例・コンテナ説明書78件）
+                      validated.py（検証済みの版の照合・改版検知）, check_retrieval.py（検索回帰テスト）,
+                      diff_index.py（索引の差分）,
+                      mcp_server.py（MCP stdio サーバ。lookup.py の cmd_* を薄くラップ。任意・pip依存）,
+                      setup_mcp.py（mcp_server 用の .venv-mcp 作成と設定例の表示）
+data/                 manuals_manifest.json（PDF16冊のURL）, examples_manifest.json（設定例・コンテナ説明書78件）,
+                      validated_versions.json（パーサを検証した時点の版）
+tests/                単体テスト（test_*.py）, retrieval_cases.json（検索回帰テストのケース）
 ```
 
 パス解決はすべて `scripts/kb_paths.py` 経由。KBの位置は `$F310_KB_DIR` → `DEFAULT_KB` の2段で決まる。
