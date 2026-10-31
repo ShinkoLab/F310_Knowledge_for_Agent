@@ -5,6 +5,10 @@
   変換: PDF → ページ番号マーカー付き md、HTML → 構造化 md
   索引: コマンド索引 JSON、設定例 INDEX.md
 
+取得は毎回サイトと突き合わせる（PDFは Last-Modified、設定例は本文の指紋）。改訂があれば取り直す。
+--check-updates はKBに触れず、サイトが検証済みの版（data/validated_versions.json）から
+変わっていないかだけを調べる。検証し直した版は --accept-current で記録する。
+
 出力先は $F310_KB_DIR、未設定なら ~/.claude/plugins/data/f310-kb-shinko-lab。
 依存は python3 と mutool(MuPDF) のみ。pip 不要。
 """
@@ -20,11 +24,7 @@ import fetch_manuals
 import gen_examples
 import gen_examples_index
 import kb_paths as kb
-
-# 既知の網羅性。抽出ロジックを変えたときにここが崩れていないかで気付けるようにする。
-EXPECT_PAGES = 3949
-EXPECT_COMMANDS = {"cmd_refe_config": 1299, "cmd_refe_ope": 615}
-EXPECT_EXAMPLES = 56
+import validated
 
 
 def check_mutool() -> bool:
@@ -68,16 +68,45 @@ def pages_on_disk(only: set = None) -> int:
     return n
 
 
+def pages_per_book() -> dict:
+    """冊（mdのstem）ごとの、KBのmdに実在するページ数。"""
+    return {md.stem: pages_on_disk(only={md.stem}) for md in sorted(kb.md_dir().glob("*.md"))}
+
+
 def verify(pages: int, counts: dict, examples: int) -> list[str]:
-    warn = []
-    if pages != EXPECT_PAGES:
-        warn.append(f"総ページ数 {pages}（想定 {EXPECT_PAGES}）")
-    for stem, want in EXPECT_COMMANDS.items():
-        got = counts.get(stem, 0)
-        if got != want:
-            warn.append(f"{stem} のコマンド数 {got}（想定 {want}）")
-    if examples != EXPECT_EXAMPLES:
-        warn.append(f"設定例md {examples} 件（想定 {EXPECT_EXAMPLES}）")
+    """網羅性を、検証済みの版（data/validated_versions.json）の冊ごとの値と突き合わせる。
+
+    手元の版が検証済みの版と同じなのに数が違えば、抽出ロジックの退行か取得漏れ（警告）。
+    手元の版が検証済みの版と違う冊は、サイト側の改訂で数が変わるのは想定どおりなので
+    警告にせず、確認して --accept-current で検証済みの版を更新するよう案内する（戻り値に含めない）。
+    """
+    ver = validated.load()
+    if not ver.get("manuals"):
+        return [f"検証済みの版が読めません（{kb.VALIDATED}）。--accept-current で作成できます"]
+    state = kb.load_state()
+    seen = state.get("manuals") if isinstance(state.get("manuals"), dict) else {}
+    ex_seen = state.get("examples") if isinstance(state.get("examples"), dict) else {}
+    on_disk = pages_per_book()
+    warn, newer = [], []
+    for name, v in ver["manuals"].items():
+        stem = name[:-4]
+        diff = []
+        if on_disk.get(stem, 0) != v["pages"]:
+            diff.append(f"ページ数 {on_disk.get(stem, 0)}（検証済み {v['pages']}）")
+        if "commands" in v and counts.get(stem, 0) != v["commands"]:
+            diff.append(f"コマンド数 {counts.get(stem, 0)}（検証済み {v['commands']}）")
+        if not diff:
+            continue
+        msg = f"{name}: " + "、".join(diff)
+        (newer if validated.manual_changed(seen.get(name), v) else warn).append(msg)
+    if examples != ver.get("example_count"):
+        msg = f"設定例md {examples} 件（検証済み {ver.get('example_count')}）"
+        (newer if validated.examples_changed(ex_seen, ver.get("examples", {})) else warn).append(msg)
+    if newer:
+        print("\n手元の版が検証済みの版より新しい箇所があります。数が変わるのは想定どおりです。\n"
+              "抽出結果を確認したうえで、問題なければ build.py --accept-current で検証済みの版を更新してください:")
+        for m in newer:
+            print(f"    - {m}")
     return warn
 
 
@@ -86,9 +115,17 @@ def main() -> int:
     ap.add_argument("--skip-fetch", action="store_true", help="取得を省き、手元のPDF/HTMLから再生成のみ行う")
     ap.add_argument("--force", action="store_true", help="取得済みでも再取得する")
     ap.add_argument("--dry-run", action="store_true", help="全URLの疎通確認のみ（保存も生成もしない）")
+    ap.add_argument("--check-updates", action="store_true",
+                    help="公式サイトが検証済みの版から変わっていないか調べる（KBには書かない。変化があれば終了コード1）")
+    ap.add_argument("--accept-current", action="store_true",
+                    help="手元のKBの現状を検証済みの版として data/validated_versions.json に書き出す（保守者向け）")
     ap.add_argument("--seed", metavar="DIR", help="既存の original/*.pdf をコピーしてDLを省く")
     ap.add_argument("--prune-pdf", action="store_true", help="変換後にPDFを削除して容量を空ける")
     args = ap.parse_args()
+
+    # KBを読み書きしない。公式サイトと検証済みの版（リポジトリ側）だけを突き合わせる
+    if args.check_updates:
+        return validated.check_updates()
 
     root = kb.kb_root()
     print(f"KB: {root}\n")
@@ -101,6 +138,10 @@ def main() -> int:
         print("移行後にもう一度 build.py を実行してください。"
               "新規に作り直す場合は旧パスを削除してから再実行してください。", file=sys.stderr)
         return 2
+
+    if args.accept_current:
+        return validated.accept_current(
+            pages_per_book(), kb.load_state().get("command_counts") or {}, kb.example_count())
 
     if args.dry_run:
         print("== URL疎通確認 ==")

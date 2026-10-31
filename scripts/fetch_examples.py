@@ -5,6 +5,8 @@
 元ページは Shift_JIS なので、後段のリニアライザが読めるよう UTF-8 に変換して保存する。
 """
 import argparse
+import hashlib
+import re
 import sys
 
 import httpget
@@ -25,6 +27,29 @@ def _decode(body: bytes, headers: dict) -> str:
         return body.decode(enc, errors="replace")
     except LookupError:
         return body.decode("cp932", errors="replace")
+
+
+# 本文の範囲。サイトにはテンプレートが2系統あり、ヘッダ・グローバルナビ・フッタ
+# （サイト全体の改修で全ページ一斉に変わる）を除いた本文だけを指紋の対象にする。
+# 新: <main>…</main> / 旧: <div id="contents"> … <div id="sitemap">
+_BODY_MARKERS = ((b"<main", b"</main>"), (b'<div id="contents"', b'<div id="sitemap"'))
+
+
+def fingerprint(body: bytes) -> str:
+    """取得した生バイトの本文部分の sha256。ページ改訂の検知に使う。
+
+    全体をハッシュすると、本文と無関係なサイト共通部の変更で全ページが「改訂」に見える。
+    該当する範囲が見つからないページは全体で代用する（検知が粗くなるだけで安全側）。
+    空白の連なりは潰す（エディタ由来の改行・インデント差を改訂扱いしないため）。
+    これを変えると検証済みの版（data/validated_versions.json）の指紋が全て無効になる。
+    """
+    for start, end in _BODY_MARKERS:
+        i = body.find(start)
+        j = body.find(end, i + 1) if i >= 0 else -1
+        if i >= 0 and j > i:
+            body = body[i:j]
+            break
+    return hashlib.sha256(re.sub(rb"\s+", b" ", body).strip()).hexdigest()
 
 
 def target_urls() -> list[str]:
@@ -65,17 +90,29 @@ def fetch_all(force: bool = False, dry_run: bool = False) -> tuple:
                 httpget.get(u, head=True)
                 print(f"  OK      {name}")
                 continue
-            if out.exists() and not force:
-                print(f"  skip    {name}")
-                continue
+            # サイトは Last-Modified も ETag も返さないので、手元にあっても毎回 GET して
+            # 本文の指紋で改訂を判定する（全件で1秒間隔×件数の時間がかかる）。
             body, headers = httpget.get(u)
             text = _decode(body, headers)
+            fp = fingerprint(body)
+            if out.exists() and not force:
+                prev = seen.get(name, {}).get("sha256")
+                # 記録が無い手元データ（旧版で取得した分）は、保存済みの本文との一致で判定する
+                # （read_text は改行を \n に揃えるので、CRLF のページは両側を揃えて比べる）
+                same = (fp == prev) if prev else (
+                    out.read_text(encoding="utf-8") == text.replace("\r\n", "\n"))
+                if same:
+                    seen[name] = {"url": u, "bytes": len(body), "sha256": fp}
+                    print(f"  same    {name}")
+                    continue
+                print(f"  CHANGED {name}  サイト側で改訂されています。取り直します")
             # 一時ファイル経由で差し替える（直接書くと失敗時に途切れたHTMLが残る）
             tmp = out.with_name(out.name + ".part")
             tmp.write_text(text, encoding="utf-8")
             tmp.replace(out)
-            seen[name] = {"url": u, "bytes": len(body)}
-            print(f"  fetched {name}")
+            seen[name] = {"url": u, "bytes": len(body), "sha256": fp}
+            if not existed or force:
+                print(f"  fetched {name}")
         except Exception as e:                      # noqa: BLE001 - 1件の失敗で全体を止めない
             if not dry_run:
                 (dest / (name + ".part")).unlink(missing_ok=True)
@@ -95,7 +132,7 @@ def fetch_all(force: bool = False, dry_run: bool = False) -> tuple:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--force", action="store_true", help="取得済みでも再取得する")
+    ap.add_argument("--force", action="store_true", help="改訂が無くても保存し直す")
     ap.add_argument("--dry-run", action="store_true", help="URL疎通のみ確認して保存しない")
     args = ap.parse_args()
     failed, stale = fetch_all(force=args.force, dry_run=args.dry_run)
